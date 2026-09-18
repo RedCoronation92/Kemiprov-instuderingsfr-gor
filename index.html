@@ -14,7 +14,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 15px;
-    background: #f4f6f9;
+    background: #9a7b00;
 }
 
 .container {
@@ -322,6 +322,403 @@ behavior: "smooth"
 }
 
 </script>
+</script>
 
+<!-- Träning på reaktionsformler börjar här -->
+
+<section class="reaction-section">
+    <h2>⚗️ Träna på reaktionsformler</h2>
+
+    <p>
+        Skriv hela den balanserade reaktionsformeln.
+        Du kan använda → eller -> som reaktionspil.
+    </p>
+
+    <div class="reaction-card">
+        <p id="reactionNumber"></p>
+
+        <div id="unbalancedReaction" class="formula"></div>
+
+        <label for="reactionAnswer">
+            Skriv den balanserade reaktionsformeln:
+        </label>
+
+        <input
+            id="reactionAnswer"
+            type="text"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder="Exempel: 2H2 + O2 -> 2H2O"
+        >
+
+        <button
+            id="checkReactionButton"
+            type="button"
+            onclick="checkReaction()"
+        >
+            Rätta svaret
+        </button>
+
+        <button
+            type="button"
+            class="secondary-button"
+            onclick="showHint()"
+        >
+            Visa ledtråd
+        </button>
+
+        <button
+            type="button"
+            class="secondary-button"
+            onclick="restartReactions()"
+        >
+            Börja om
+        </button>
+
+        <div id="reactionFeedback" aria-live="polite"></div>
+        <div id="reactionScore"></div>
+    </div>
+</section>
+
+<style>
+.reaction-section {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 3px solid #1976d2;
+}
+
+.reaction-section h2 {
+    color: #1565c0;
+    text-align: center;
+}
+
+.reaction-card {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f4f8ff;
+    border-left: 5px solid #1976d2;
+    border-radius: 8px;
+}
+
+.formula {
+    margin: 18px 0;
+    padding: 18px;
+    overflow-wrap: anywhere;
+    background: white;
+    border: 2px solid #bbdefb;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+#reactionAnswer {
+    width: 100%;
+    min-height: 54px;
+    margin: 12px 0;
+    padding: 12px;
+    border: 2px solid #90a4ae;
+    border-radius: 8px;
+    font-size: 1.05rem;
+}
+
+#reactionAnswer:focus {
+    border-color: #1976d2;
+    outline: 3px solid rgba(25, 118, 210, 0.2);
+}
+
+.secondary-button {
+    margin-top: 10px;
+    color: #0d47a1;
+    background: #e3f2fd;
+}
+
+.secondary-button:hover {
+    background: #bbdefb;
+}
+
+#reactionFeedback {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.correct-feedback {
+    color: #155724;
+    background: #d4edda;
+}
+
+.wrong-feedback {
+    color: #721c24;
+    background: #f8d7da;
+}
+
+.hint-feedback {
+    color: #664d03;
+    background: #fff3cd;
+}
+
+#reactionScore {
+    margin-top: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .reaction-card {
+        padding: 15px;
+    }
+
+    .formula {
+        font-size: 1.2rem;
+    }
+
+    #reactionAnswer {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+const reactionExercises = [
+    {
+        unbalanced: "H₂ + O₂ → H₂O",
+        answer: "2H2+O2->2H2O",
+        displayAnswer: "2H₂ + O₂ → 2H₂O",
+        hint: "Gör först antalet syreatomer lika på båda sidor."
+    },
+    {
+        unbalanced: "N₂ + H₂ → NH₃",
+        answer: "N2+3H2->2NH3",
+        displayAnswer: "N₂ + 3H₂ → 2NH₃",
+        hint: "Det finns två kväveatomer på vänster sida."
+    },
+    {
+        unbalanced: "Fe + O₂ → Fe₂O₃",
+        answer: "4FE+3O2->2FE2O3",
+        displayAnswer: "4Fe + 3O₂ → 2Fe₂O₃",
+        hint: "Försök få sex syreatomer på båda sidor."
+    },
+    {
+        unbalanced: "CH₄ + O₂ → CO₂ + H₂O",
+        answer: "CH4+2O2->CO2+2H2O",
+        displayAnswer: "CH₄ + 2O₂ → CO₂ + 2H₂O",
+        hint: "Balansera kol först, väte därefter och syre sist."
+    },
+    {
+        unbalanced: "Al + O₂ → Al₂O₃",
+        answer: "4AL+3O2->2AL2O3",
+        displayAnswer: "4Al + 3O₂ → 2Al₂O₃",
+        hint: "Försök få sex syreatomer på båda sidor."
+    },
+    {
+        unbalanced: "Mg + O₂ → MgO",
+        answer: "2MG+O2->2MGO",
+        displayAnswer: "2Mg + O₂ → 2MgO",
+        hint: "Syre förekommer som O₂ på vänster sida."
+    },
+    {
+        unbalanced: "Na + Cl₂ → NaCl",
+        answer: "2NA+CL2->2NACL",
+        displayAnswer: "2Na + Cl₂ → 2NaCl",
+        hint: "Det finns två kloratomer på vänster sida."
+    },
+    {
+        unbalanced: "CaCO₃ → CaO + CO₂",
+        answer: "CACO3->CAO+CO2",
+        displayAnswer: "CaCO₃ → CaO + CO₂",
+        hint: "Kontrollera om formeln redan är balanserad."
+    }
+];
+
+let currentReaction = 0;
+let reactionScore = 0;
+let reactionAnswered = false;
+
+function normalizeReaction(value) {
+    return value
+        .toUpperCase()
+        .replaceAll("₁", "1")
+        .replaceAll("₂", "2")
+        .replaceAll("₃", "3")
+        .replaceAll("₄", "4")
+        .replaceAll("₅", "5")
+        .replaceAll("₆", "6")
+        .replaceAll("₇", "7")
+        .replaceAll("₈", "8")
+        .replaceAll("₉", "9")
+        .replaceAll("→", "->")
+        .replaceAll("=", "->")
+        .replace(/\s+/g, "");
+}
+
+function showReaction() {
+    const exercise = reactionExercises[currentReaction];
+
+    document.getElementById("reactionNumber").textContent =
+        "Uppgift " +
+        (currentReaction + 1) +
+        " av " +
+        reactionExercises.length;
+
+    document.getElementById("unbalancedReaction").textContent =
+        exercise.unbalanced;
+
+    document.getElementById("reactionAnswer").value = "";
+
+    const feedback =
+        document.getElementById("reactionFeedback");
+
+    feedback.textContent = "";
+    feedback.className = "";
+
+    document.getElementById("reactionScore").textContent =
+        "Poäng: " +
+        reactionScore +
+        " av " +
+        reactionExercises.length;
+
+    document.getElementById("checkReactionButton").textContent =
+        "Rätta svaret";
+
+    reactionAnswered = false;
+}
+
+function checkReaction() {
+    if (reactionAnswered) {
+        nextReaction();
+        return;
+    }
+
+    const answer =
+        document.getElementById("reactionAnswer").value;
+
+    const feedback =
+        document.getElementById("reactionFeedback");
+
+    const exercise =
+        reactionExercises[currentReaction];
+
+    if (answer.trim() === "") {
+        feedback.textContent =
+            "Skriv en reaktionsformel innan du rättar.";
+
+        feedback.className = "wrong-feedback";
+        return;
+    }
+
+    const isCorrect =
+        normalizeReaction(answer) ===
+        normalizeReaction(exercise.answer);
+
+    if (isCorrect) {
+        reactionScore++;
+
+        feedback.textContent =
+            "✅ Rätt! " + exercise.displayAnswer;
+
+        feedback.className = "correct-feedback";
+    } else {
+        feedback.textContent =
+            "❌ Inte riktigt. Rätt svar är: " +
+            exercise.displayAnswer;
+
+        feedback.className = "wrong-feedback";
+    }
+
+    reactionAnswered = true;
+
+    document.getElementById("reactionScore").textContent =
+        "Poäng: " +
+        reactionScore +
+        " av " +
+        reactionExercises.length;
+
+    document.getElementById("checkReactionButton").textContent =
+        currentReaction === reactionExercises.length - 1
+            ? "Visa resultat"
+            : "Nästa uppgift";
+}
+
+function nextReaction() {
+    if (currentReaction < reactionExercises.length - 1) {
+        currentReaction++;
+        showReaction();
+    } else {
+        showFinalReactionResult();
+    }
+}
+
+function showHint() {
+    const exercise =
+        reactionExercises[currentReaction];
+
+    const feedback =
+        document.getElementById("reactionFeedback");
+
+    feedback.textContent =
+        "💡 Ledtråd: " + exercise.hint;
+
+    feedback.className = "hint-feedback";
+}
+
+function showFinalReactionResult() {
+    const feedback =
+        document.getElementById("reactionFeedback");
+
+    let message =
+        "Du fick " +
+        reactionScore +
+        " av " +
+        reactionExercises.length +
+        " rätt. ";
+
+    if (reactionScore === reactionExercises.length) {
+        message += "🌟 Alla rätt!";
+    } else if (reactionScore >= 6) {
+        message += "✅ Mycket bra jobbat!";
+    } else if (reactionScore >= 4) {
+        message += "📚 Bra början. Öva på de svårare formlerna.";
+    } else {
+        message += "🧪 Fortsätt träna och använd ledtrådarna.";
+    }
+
+    feedback.textContent = message;
+
+    feedback.className =
+        reactionScore >= 6
+            ? "correct-feedback"
+            : "hint-feedback";
+
+    document.getElementById("checkReactionButton").style.display =
+        "none";
+}
+
+function restartReactions() {
+    currentReaction = 0;
+    reactionScore = 0;
+
+    document.getElementById("checkReactionButton").style.display =
+        "block";
+
+    showReaction();
+}
+
+document
+    .getElementById("reactionAnswer")
+    .addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkReaction();
+        }
+    });
+
+showReaction();
+</script>
+
+</body>
+</html>
 </body>
 </html>
