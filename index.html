@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kemi 1 Prov 1 - Quiz</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 15px;
+    background: #f4f6f9;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #1565c0;
+}
+
+.question {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fafafa;
+    border-left: 4px solid #1976d2;
+    border-radius: 6px;
+}
+
+.question p {
+    font-weight: bold;
+}
+
+label {
+    display: block;
+    padding: 10px;
+    margin: 5px 0;
+    background: #eef4ff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    color: white;
+    background: #1976d2;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1259a7;
+}
+
+#result {
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.correct {
+    color: green;
+}
+
+.wrong {
+    color: red;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🧪 Kemi 1 – Quiz Prov 1</h1>
+
+<form id="quizForm">
+
+<div id="questions"></div>
+
+<button type="button" onclick="checkQuiz()">Rätta Quizet</button>
+
+</form>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+question: "1. Vilken partikel har positiv laddning?",
+answers: ["Elektron", "Neutron", "Proton", "Jon"],
+correct: 2
+},
+{
+question: "2. Var finns atomens protoner?",
+answers: ["I elektronskalen", "I atomkärnan", "Utanför atomen", "I molekyler"],
+correct: 1
+},
+{
+question: "3. Vad anger atomnumret?",
+answers: ["Antalet neutroner", "Antalet elektronskal", "Antalet protoner", "Atomens massa"],
+correct: 2
+},
+{
+question: "4. Vad är en isotop?",
+answers: [
+"Ett grundämne med olika antal protoner",
+"Atomer av samma grundämne med olika antal neutroner",
+"En positiv jon",
+"En kemisk förening"
+],
+correct: 1
+},
+{
+question: "5. I vilken grupp finns ädelgaserna?",
+answers: ["Grupp 1", "Grupp 2", "Grupp 17", "Grupp 18"],
+correct: 3
+},
+{
+question: "6. Vad kännetecknar ädelgaser?",
+answers: [
+"De reagerar lätt",
+"De är mycket instabila",
+"De reagerar sällan",
+"De bildar alltid joner"
+],
+correct: 2
+},
+{
+question: "7. Vad är en jon?",
+answers: [
+"En neutral atom",
+"En laddad atom eller partikel",
+"Ett elektronpar",
+"En molekyl"
+],
+correct: 1
+},
+{
+question: "8. Hur bildas en positiv jon?",
+answers: [
+"Atomen tar upp elektroner",
+"Atomen delar elektroner",
+"Atomen avger elektroner",
+"Atomen tar upp neutroner"
+],
+correct: 2
+},
+{
+question: "9. Vilken typ av bindning finns i natriumklorid (NaCl)?",
+answers: [
+"Metallbindning",
+"Kovalent bindning",
+"Jonbindning",
+"Vätebindning"
+],
+correct: 2
+},
+{
+question: "10. Vad är en kovalent bindning?",
+answers: [
+"Elektroner överförs helt",
+"Protoner delas",
+"Atomer delar elektronpar",
+"Neutroner byter plats"
+],
+correct: 2
+},
+{
+question: "11. Vilken formel har vatten?",
+answers: ["CO₂", "H₂O", "O₂", "H₂"],
+correct: 1
+},
+{
+question: "12. Hur många syreatomer finns i CO₂?",
+answers: ["1", "2", "3", "4"],
+correct: 1
+},
+{
+question: "13. Vad är en kemisk förening?",
+answers: [
+"Ett ämne med bara ett grundämne",
+"Ett ämne som består av minst två olika grundämnen",
+"En blandning",
+"En atom"
+],
+correct: 1
+},
+{
+question: "14. Vad kallas ämnena före en kemisk reaktion?",
+answers: ["Produkter", "Reaktanter", "Isotoper", "Lösningar"],
+correct: 1
+},
+{
+question: "15. Vad kallas ämnena efter en kemisk reaktion?",
+answers: ["Produkter", "Reaktanter", "Joner", "Atomer"],
+correct: 0
+},
+{
+question: "16. Vad säger lagen om materiens bevarande?",
+answers: [
+"Materia kan skapas",
+"Materia kan förstöras",
+"Materia varken skapas eller förstörs",
+"Atomer försvinner vid reaktioner"
+],
+correct: 2
+},
+{
+question: "17. Vilket ämne behövs alltid vid förbränning?",
+answers: ["Kväve", "Syre", "Helium", "Väte"],
+correct: 1
+},
+{
+question: "18. Vad är en homogen blandning?",
+answers: [
+"En blandning där delarna syns tydligt",
+"En blandning som är jämnt fördelad",
+"En ren substans",
+"En kemisk förening"
+],
+correct: 1
+},
+{
+question: "19. Vilket är ett exempel på en heterogen blandning?",
+answers: [
+"Saltvatten",
+"Luft",
+"Olja och vatten",
+"Sockerlösning"
+],
+correct: 2
+},
+{
+question: "20. Vilket grundämne finns i grupp 1?",
+answers: ["Klor", "Neon", "Natrium", "Syre"],
+correct: 2
+}
+
+];
+
+const container = document.getElementById("questions");
+
+questions.forEach((q, index) => {
+
+const div = document.createElement("div");
+div.className = "question";
+
+let html = `<p>${q.question}</p>`;
+
+q.answers.forEach((answer, aIndex) => {
+html += `
+<label>
+<input type="radio" name="q${index}" value="${aIndex}">
+${answer}
+</label>`;
+});
+
+div.innerHTML = html;
+container.appendChild(div);
+
+});
+
+function checkQuiz() {
+
+let score = 0;
+
+questions.forEach((q, index) => {
+
+const selected = document.querySelector(
+`input[name="q${index}"]:checked`
+);
+
+if(selected && Number(selected.value) === q.correct) {
+score++;
+}
+
+});
+
+let message = `Du fick ${score} av ${questions.length} rätt.<br><br>`;
+
+if(score >= 18){
+message += "🌟 Mycket väl förberedd!";
+}
+else if(score >= 15){
+message += "✅ Bra kunskaper!";
+}
+else if(score >= 10){
+message += "📚 Fortsätt träna på grunderna.";
+}
+else{
+message += "🧪 Läs igenom teorin och försök igen.";
+}
+
+document.getElementById("result").innerHTML = message;
+
+window.scrollTo({
+top: document.body.scrollHeight,
+behavior: "smooth"
+});
+
+}
+
+</script>
+
+</body>
+</html>
