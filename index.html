@@ -1,11 +1,40 @@
+
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kemi 1 Prov 1 - Quiz och reaktionsformler</title>
+<title>Kemi 1 – Quiz och träning</title>
 <style>
-*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;padding:15px;background:#9a7b00;color:#1f2937}.container{max-width:900px;margin:auto;background:#fffdf2;padding:20px;border-radius:12px;box-shadow:0 2px 10px #0003}h1,h2{text-align:center;color:#5f4b00}.instructions,.question,.reaction-card{margin-bottom:20px;padding:16px;background:#fff8d6;border-left:5px solid #9a7b00;border-radius:8px}.instructions{border:2px solid #d4aa00}.instructions li{margin-bottom:9px;line-height:1.45}.question p,label{font-weight:bold}label{display:block;padding:11px;margin:6px 0;background:#fff;border-radius:6px;cursor:pointer}button{width:100%;min-height:48px;padding:13px;font-size:1rem;font-weight:bold;color:#fff;background:#725900;border:0;border-radius:8px;cursor:pointer}button:hover,button:focus{background:#4f3e00}.secondary{margin-top:10px;color:#493900;background:#f7dc72}.formula{margin:18px 0;padding:18px;background:#fff;border:2px solid #d4aa00;border-radius:8px;text-align:center;font-size:1.5rem;font-weight:bold}.answer-input{width:100%;min-height:54px;margin:10px 0;padding:12px;border:2px solid #8b7500;border-radius:8px;font-size:1.05rem}.symbol-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.symbol-toolbar button{flex:1 1 54px;min-width:54px;color:#302600;background:#ffe37a;border:1px solid #9a7b00}.feedback,#result{margin-top:16px;padding:14px;border-radius:8px;text-align:center;font-weight:bold}.correct{color:#155724;background:#d4edda}.hint{color:#5c4500;background:#fff0ad;border:1px solid #c39b00}.score{text-align:center;font-weight:bold;margin-top:14px}.reaction-section{margin-top:35px;padding-top:25px;border-top:3px solid #9a7b00}.small{font-size:.93rem;color:#4b5563}@media(max-width:600px){body{padding:8px}.container{padding:14px}h1{font-size:1.5rem}.formula{font-size:1.18rem}}
+* { box-sizing: border-box; }
+body { font-family: Arial, sans-serif; margin: 0; padding: 15px; background: #9a7b00; color: #1f2937; }
+.container { max-width: 900px; margin: auto; padding: 20px; background: #fffdf2; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.2); }
+h1, h2 { color: #5f4b00; text-align: center; }
+.instructions, .question, .card { margin-bottom: 20px; padding: 16px; background: #fff8d6; border-left: 5px solid #9a7b00; border-radius: 8px; }
+.instructions { border: 2px solid #d4aa00; }
+.instructions li { margin-bottom: 9px; line-height: 1.45; }
+.question p, label { font-weight: bold; }
+label { display: block; padding: 11px; margin: 6px 0; background: #fff; border-radius: 6px; cursor: pointer; }
+button { width: 100%; min-height: 48px; padding: 13px; color: #fff; background: #725900; border: 0; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+button:hover, button:focus { background: #4f3e00; }
+.secondary { margin-top: 10px; color: #493900; background: #f7dc72; }
+.formula, .molecule { margin: 18px 0; padding: 18px; background: #fff; border: 2px solid #d4aa00; border-radius: 8px; color: #1f2937; text-align: center; font-size: 1.45rem; font-weight: bold; white-space: pre-line; }
+.answer-input, select { width: 100%; min-height: 54px; margin: 8px 0 14px; padding: 12px; border: 2px solid #8b7500; border-radius: 8px; background-color: #fff !important; color: #111827 !important; -webkit-text-fill-color: #111827 !important; color-scheme: light; font-size: 1.05rem; }
+select { appearance: auto; -webkit-appearance: menulist; }
+select option { background-color: #fff !important; color: #111827 !important; -webkit-text-fill-color: #111827 !important; }
+.symbol-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.symbol-toolbar button { flex: 1 1 54px; min-width: 54px; color: #302600; background: #ffe37a; border: 1px solid #9a7b00; }
+.feedback, #result { margin-top: 16px; padding: 14px; border-radius: 8px; text-align: center; font-weight: bold; line-height: 1.45; }
+.correct { color: #155724; background: #d4edda; }
+.hint { color: #5c4500; background: #fff0ad; border: 1px solid #c39b00; }
+.score { margin-top: 14px; text-align: center; font-weight: bold; }
+.section { margin-top: 35px; padding-top: 25px; border-top: 3px solid #9a7b00; }
+.structure-key { padding: 12px; background: #fff; border-radius: 8px; line-height: 1.5; }
+.bond-options { margin: 8px 0 14px; padding: 12px; border: 2px solid #8b7500; border-radius: 8px; }
+.bond-options legend { padding: 0 6px; font-weight: bold; }
+.bond-options label { font-weight: normal; }
+@media (max-width: 600px) { body { padding: 8px; } .container { padding: 14px; } h1 { font-size: 1.5rem; } .formula, .molecule { font-size: 1.15rem; } }
 </style>
 </head>
 <body>
@@ -25,37 +54,190 @@
 </section>
 <form id="quizForm"><div id="questions"></div><button type="button" onclick="checkQuiz()">Rätta quizet</button></form>
 <div id="result" aria-live="polite"></div>
-<section class="reaction-section">
+<section class="section">
 <h2>⚗️ Träna på reaktionsformler</h2>
 <p>Skriv hela den balanserade reaktionsformeln. Vid fel får du en ledtråd och kan försöka igen.</p>
-<div class="reaction-card">
-<p id="reactionNumber"></p><div id="unbalancedReaction" class="formula"></div>
-<label for="reactionAnswer">Skriv den balanserade reaktionsformeln:</label>
-<input id="reactionAnswer" class="answer-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Exempel: 2H2 + O2 -> 2H2O">
-<div class="symbol-toolbar" aria-label="Infoga kemiska symboler">
-<button type="button" onclick="insertSymbol('₁')">₁</button><button type="button" onclick="insertSymbol('₂')">₂</button><button type="button" onclick="insertSymbol('₃')">₃</button><button type="button" onclick="insertSymbol('₄')">₄</button><button type="button" onclick="insertSymbol('²')">²</button><button type="button" onclick="insertSymbol('³')">³</button><button type="button" onclick="insertSymbol('⁺')">⁺</button><button type="button" onclick="insertSymbol('⁻')">⁻</button><button type="button" onclick="insertSymbol('→')">→</button>
+<div class="card">
+<p id="reactionNumber"></p>
+<div id="unbalancedReaction" class="formula"></div>
+<label for="reactionAnswer">Balanserad reaktionsformel:</label>
+<input id="reactionAnswer" class="answer-input" type="text" autocomplete="off" spellcheck="false" placeholder="Exempel: 2H2 + O2 -> 2H2O">
+<div class="symbol-toolbar">
+<button type="button" onclick="insertSymbol('₂')">₂</button><button type="button" onclick="insertSymbol('₃')">₃</button><button type="button" onclick="insertSymbol('₄')">₄</button><button type="button" onclick="insertSymbol('²')">²</button><button type="button" onclick="insertSymbol('³')">³</button><button type="button" onclick="insertSymbol('⁺')">⁺</button><button type="button" onclick="insertSymbol('⁻')">⁻</button><button type="button" onclick="insertSymbol('→')">→</button>
 </div>
-<button id="checkReactionButton" type="button" onclick="checkReaction()">Rätta svaret</button>
-<button class="secondary" type="button" onclick="showHint()">Visa en ledtråd</button>
+<button id="reactionButton" type="button" onclick="checkReaction()">Rätta svaret</button>
+<button class="secondary" type="button" onclick="showReactionHint()">Visa en ledtråd</button>
 <button class="secondary" type="button" onclick="restartReactions()">Börja om</button>
-<div id="reactionFeedback" class="feedback" aria-live="polite"></div><div id="reactionScore" class="score"></div>
-</div></section>
+<div id="reactionFeedback" class="feedback" aria-live="polite"></div>
+<div id="reactionScore" class="score"></div>
+</div>
+</section>
+<section class="section">
+<h2>🔗 Polaritet och bindningar mellan molekyler</h2>
+<div class="instructions">
+<p><strong>Arbetsgång:</strong></p>
+<ol><li>Avgör om bindningarna är polära.</li><li>Studera molekylens form och symmetri.</li><li>Avgör om hela molekylen är polär eller opolär.</li><li>Välj den starkaste intermolekylära bindningen.</li></ol>
+<div class="structure-key"><strong>Kom ihåg:</strong><br>• Alla molekyler har Van der Waals-bindning (dispersionskraft/Londonkraft).<br>• Polära molekyler har även dipol-dipolbindning.<br>• Molekyler med H direkt bundet till N, O eller F kan bilda vätebindning.<br>• Markera <strong>alla</strong> intermolekylära krafter som förekommer och välj sedan den intramolekylära bindningstypen.</div>
+</div>
+<div class="card">
+<p id="bondNumber"></p>
+<div id="bondMolecule" class="molecule"></div>
+<label for="polarityAnswer">Är molekylen polär eller opolär?</label>
+<select id="polarityAnswer"><option value="">Välj ett svar</option><option value="polar">Polär</option><option value="nonpolar">Opolär</option></select>
+<fieldset class="bond-options">
+<legend>Vilka intermolekylära krafter förekommer mellan molekylerna?</legend>
+<label><input id="forceDispersion" type="checkbox"> Van der Waals-bindning (dispersionskraft/Londonkraft)</label>
+<label><input id="forceDipole" type="checkbox"> Dipol-dipolbindning</label>
+<label><input id="forceHydrogen" type="checkbox"> Vätebindning</label>
+</fieldset>
+<label for="intraAnswer">Vilken typ av intramolekylär bindning finns i molekylen?</label>
+<select id="intraAnswer">
+<option value="">Välj ett svar</option>
+<option value="nonpolar-covalent">Opolär kovalent bindning</option>
+<option value="polar-covalent">Polär kovalent bindning</option>
+<option value="mixed-covalent">Både polär och opolär kovalent bindning</option>
+<option value="ionic">Jonbindning</option>
+<option value="metallic">Metallbindning</option>
+</select>
+<button id="bondButton" type="button" onclick="checkBond()">Rätta svaret</button>
+<button class="secondary" type="button" onclick="showBondHint()">Visa en ledtråd</button>
+<button class="secondary" type="button" onclick="restartBonds()">Börja om</button>
+<div id="bondFeedback" class="feedback" aria-live="polite"></div>
+<div id="bondScore" class="score"></div>
+</div>
+</section>
 </main>
 <script>
-const questions=[
-["Vilken partikel har positiv laddning?",["Elektron","Neutron","Proton","Jon"],2],["Var finns atomens protoner?",["I elektronskalen","I atomkärnan","Utanför atomen","I molekyler"],1],["Vad anger atomnumret?",["Antalet neutroner","Antalet elektronskal","Antalet protoner","Atomens massa"],2],["Vad är en isotop?",["Ett grundämne med olika antal protoner","Atomer av samma grundämne med olika antal neutroner","En positiv jon","En kemisk förening"],1],["I vilken grupp finns ädelgaserna?",["Grupp 1","Grupp 2","Grupp 17","Grupp 18"],3],["Vad kännetecknar ädelgaser?",["De reagerar lätt","De är mycket instabila","De reagerar sällan","De bildar alltid joner"],2],["Vad är en jon?",["En neutral atom","En laddad atom eller partikel","Ett elektronpar","En molekyl"],1],["Hur bildas en positiv jon?",["Atomen tar upp elektroner","Atomen delar elektroner","Atomen avger elektroner","Atomen tar upp neutroner"],2],["Vilken bindning finns i NaCl?",["Metallbindning","Kovalent bindning","Jonbindning","Vätebindning"],2],["Vad är en kovalent bindning?",["Elektroner överförs helt","Protoner delas","Atomer delar elektronpar","Neutroner byter plats"],2],["Vilken formel har vatten?",["CO₂","H₂O","O₂","H₂"],1],["Hur många syreatomer finns i CO₂?",["1","2","3","4"],1],["Vad är en kemisk förening?",["Ett ämne med bara ett grundämne","Ett ämne med minst två olika grundämnen","En blandning","En atom"],1],["Vad kallas ämnena före en kemisk reaktion?",["Produkter","Reaktanter","Isotoper","Lösningar"],1],["Vad kallas ämnena efter en kemisk reaktion?",["Produkter","Reaktanter","Joner","Atomer"],0],["Vad säger lagen om materiens bevarande?",["Materia kan skapas","Materia kan förstöras","Materia varken skapas eller förstörs","Atomer försvinner"],2],["Vilket ämne behövs alltid vid förbränning?",["Kväve","Syre","Helium","Väte"],1],["Vad är en homogen blandning?",["Delarna syns tydligt","Blandningen är jämnt fördelad","En ren substans","En kemisk förening"],1],["Vilket är en heterogen blandning?",["Saltvatten","Luft","Olja och vatten","Sockerlösning"],2],["Vilket grundämne finns i grupp 1?",["Klor","Neon","Natrium","Syre"],2]];
-const qc=document.getElementById('questions');questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';d.innerHTML=`<p>${i+1}. ${q[0]}</p>`+q[1].map((a,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${a}</label>`).join('');qc.appendChild(d)});
-function checkQuiz(){let s=0;questions.forEach((q,i)=>{const a=document.querySelector(`input[name="q${i}"]:checked`);if(a&&+a.value===q[2])s++});let m=`Du fick ${s} av ${questions.length} rätt.<br><br>`;m+=s>=18?'🌟 Mycket väl förberedd!':s>=15?'✅ Bra kunskaper!':s>=10?'📚 Fortsätt träna på grunderna.':'🧪 Läs igenom teorin och försök igen.';document.getElementById('result').innerHTML=m}
-const exercises=[
-{u:'H₂ + O₂ → H₂O',a:'2H2+O2->2H2O',h:['Räkna väte- och syreatomer på båda sidor.','Börja med att sätta 2 framför H₂O.','Justera därefter koefficienten framför H₂.']},{u:'N₂ + H₂ → NH₃',a:'N2+3H2->2NH3',h:['Börja med kvävet.','Sätt 2 framför NH₃.','Räkna sedan väteatomerna.']},{u:'Fe + O₂ → Fe₂O₃',a:'4FE+3O2->2FE2O3',h:['Syre förekommer två och tre åt gången.','Minsta gemensamma multipel är 6.','Balansera järnet sist.']},{u:'CH₄ + O₂ → CO₂ + H₂O',a:'CH4+2O2->CO2+2H2O',h:['Balansera kol först.','Balansera väte därefter.','Balansera syre sist.']},{u:'Al + O₂ → Al₂O₃',a:'4AL+3O2->2AL2O3',h:['Försök få sex syreatomer på båda sidor.','Sätt 3 framför O₂ och 2 framför Al₂O₃.','Balansera aluminium sist.']},{u:'Mg + O₂ → MgO',a:'2MG+O2->2MGO',h:['Syre finns som O₂.','Gör två syreatomer på höger sida.','Justera magnesium.']},{u:'Na + Cl₂ → NaCl',a:'2NA+CL2->2NACL',h:['Det finns två kloratomer på vänster sida.','Gör två NaCl på höger sida.','Justera natrium.']},{u:'CaCO₃ → CaO + CO₂',a:'CACO3->CAO+CO2',h:['Räkna varje atomslag.','Kontrollera Ca, C och O var för sig.','Reaktionen kan redan vara balanserad.']}];
-let current=0,reactionScore=0,answered=false,hintLevel=0;
-function normalize(v){return v.toUpperCase().replaceAll('₁','1').replaceAll('₂','2').replaceAll('₃','3').replaceAll('₄','4').replaceAll('²','2').replaceAll('³','3').replaceAll('→','->').replaceAll('=','->').replace(/\s+/g,'')}
-function insertSymbol(s){const i=document.getElementById('reactionAnswer'),a=i.selectionStart??i.value.length,b=i.selectionEnd??i.value.length;i.value=i.value.slice(0,a)+s+i.value.slice(b);i.focus();i.setSelectionRange(a+s.length,a+s.length)}
-function showReaction(){const e=exercises[current];document.getElementById('reactionNumber').textContent=`Uppgift ${current+1} av ${exercises.length}`;document.getElementById('unbalancedReaction').textContent=e.u;document.getElementById('reactionAnswer').value='';const f=document.getElementById('reactionFeedback');f.textContent='';f.className='feedback';document.getElementById('reactionScore').textContent=`Poäng: ${reactionScore} av ${exercises.length}`;document.getElementById('checkReactionButton').textContent='Rätta svaret';answered=false;hintLevel=0}
-function checkReaction(){if(answered){nextReaction();return}const v=document.getElementById('reactionAnswer').value.trim(),f=document.getElementById('reactionFeedback'),e=exercises[current];if(!v){f.textContent='Skriv en reaktionsformel innan du rättar.';f.className='feedback hint';return}if(normalize(v)===normalize(e.a)){reactionScore++;answered=true;f.textContent='✅ Rätt! Bra balanserat.';f.className='feedback correct';document.getElementById('checkReactionButton').textContent=current===exercises.length-1?'Visa resultat':'Nästa uppgift'}else{hintLevel=Math.min(hintLevel+1,e.h.length);f.textContent='💡 Inte riktigt ännu. Ledtråd: '+e.h[hintLevel-1]+' Ändra svaret och försök igen.';f.className='feedback hint'}document.getElementById('reactionScore').textContent=`Poäng: ${reactionScore} av ${exercises.length}`}
-function showHint(){const e=exercises[current],f=document.getElementById('reactionFeedback');hintLevel=Math.min(hintLevel+1,e.h.length);f.textContent='💡 Ledtråd: '+e.h[hintLevel-1];f.className='feedback hint'}function nextReaction(){if(current<exercises.length-1){current++;showReaction()}else{const f=document.getElementById('reactionFeedback');f.textContent=`Klart! Du fick ${reactionScore} av ${exercises.length} rätt.`;f.className=reactionScore>=6?'feedback correct':'feedback hint';document.getElementById('checkReactionButton').style.display='none'}}
-function restartReactions(){current=0;reactionScore=0;document.getElementById('checkReactionButton').style.display='block';showReaction()}
-document.getElementById('reactionAnswer').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checkReaction()}});showReaction();
+const questions = [
+["Vilken partikel har positiv laddning?",["Elektron","Neutron","Proton","Jon"],2],
+["Var finns atomens protoner?",["I elektronskalen","I atomkärnan","Utanför atomen","I molekyler"],1],
+["Vad anger atomnumret?",["Antalet neutroner","Antalet elektronskal","Antalet protoner","Atomens massa"],2],
+["Vad är en isotop?",["Atomer med olika antal protoner","Atomer av samma grundämne med olika antal neutroner","En positiv jon","En kemisk förening"],1],
+["I vilken grupp finns ädelgaserna?",["Grupp 1","Grupp 2","Grupp 17","Grupp 18"],3],
+["Vad kännetecknar ädelgaser?",["De reagerar lätt","De är mycket instabila","De reagerar sällan","De bildar alltid joner"],2],
+["Vad är en jon?",["En neutral atom","En laddad atom eller partikel","Ett elektronpar","En molekyl"],1],
+["Hur bildas en positiv jon?",["Atomen tar upp elektroner","Atomen delar elektroner","Atomen avger elektroner","Atomen tar upp neutroner"],2],
+["Vilken bindning finns i natriumklorid, NaCl?",["Metallbindning","Kovalent bindning","Jonbindning","Vätebindning"],2],
+["Vad är en kovalent bindning?",["Elektroner överförs helt","Protoner delas","Atomer delar elektronpar","Neutroner byter plats"],2],
+["Vilken formel har vatten?",["CO₂","H₂O","O₂","H₂"],1],
+["Hur många syreatomer finns i CO₂?",["1","2","3","4"],1],
+["Vad är en kemisk förening?",["Ett ämne med bara ett grundämne","Ett ämne med minst två olika grundämnen","En blandning","En atom"],1],
+["Vad kallas ämnena före en kemisk reaktion?",["Produkter","Reaktanter","Isotoper","Lösningar"],1],
+["Vad kallas ämnena efter en kemisk reaktion?",["Produkter","Reaktanter","Joner","Atomer"],0],
+["Vad säger lagen om materiens bevarande?",["Materia kan skapas","Materia kan förstöras","Materia varken skapas eller förstörs","Atomer försvinner"],2],
+["Vilket ämne behövs vid förbränning?",["Kväve","Syre","Helium","Väte"],1],
+["Vad är en homogen blandning?",["Delarna syns tydligt","Blandningen är jämnt fördelad","En ren substans","En kemisk förening"],1],
+["Vilket är en heterogen blandning?",["Saltvatten","Luft","Olja och vatten","Sockerlösning"],2],
+["Vilket grundämne finns i grupp 1?",["Klor","Neon","Natrium","Syre"],2]
+];
+const questionContainer = document.getElementById("questions");
+questions.forEach(function(q,i){
+  const div=document.createElement("div");
+  div.className="question";
+  div.innerHTML="<p>"+(i+1)+". "+q[0]+"</p>"+q[1].map(function(a,j){return '<label><input type="radio" name="q'+i+'" value="'+j+'"> '+a+'</label>';}).join("");
+  questionContainer.appendChild(div);
+});
+function checkQuiz(){let score=0;questions.forEach(function(q,i){const a=document.querySelector('input[name="q'+i+'"]:checked');if(a&&Number(a.value)===q[2])score++;});let message="Du fick "+score+" av "+questions.length+" rätt.<br><br>";message+=score>=18?"🌟 Mycket väl förberedd!":score>=15?"✅ Bra kunskaper!":score>=10?"📚 Fortsätt träna.":"🧪 Repetera grunderna.";document.getElementById("result").innerHTML=message;}
+
+
+const reactions=[
+{u:"H₂ + O₂ → H₂O",a:"2H2+O2->2H2O",h:["Räkna H och O på båda sidor.","Sätt 2 framför H₂O.","Justera H₂."]},
+{u:"N₂ + H₂ → NH₃",a:"N2+3H2->2NH3",h:["Börja med kvävet.","Sätt 2 framför NH₃.","Justera H₂."]},
+{u:"Fe + O₂ → Fe₂O₃",a:"4FE+3O2->2FE2O3",h:["Minsta gemensamma multipel för 2 och 3 är 6.","Gör sex O på båda sidor.","Balansera Fe sist."]},
+{u:"CH₄ + O₂ → CO₂ + H₂O",a:"CH4+2O2->CO2+2H2O",h:["Balansera C först.","Balansera H därefter.","Balansera O sist."]},
+{u:"Al + O₂ → Al₂O₃",a:"4AL+3O2->2AL2O3",h:["Försök få sex O.","Sätt 3 framför O₂ och 2 framför Al₂O₃.","Balansera Al."]}
+];
+let reactionIndex=0,reactionPoints=0,reactionCorrect=false,reactionHint=0;
+function normalizeReaction(v){return v.toUpperCase().replaceAll("₁","1").replaceAll("₂","2").replaceAll("₃","3").replaceAll("₄","4").replaceAll("→","->").replace(/\s+/g,"");}
+function insertSymbol(symbol){const input=document.getElementById("reactionAnswer");const start=input.selectionStart??input.value.length;const end=input.selectionEnd??start;input.value=input.value.slice(0,start)+symbol+input.value.slice(end);input.focus();input.setSelectionRange(start+symbol.length,start+symbol.length);}
+function showReaction(){const e=reactions[reactionIndex];document.getElementById("reactionNumber").textContent="Uppgift "+(reactionIndex+1)+" av "+reactions.length;document.getElementById("unbalancedReaction").textContent=e.u;document.getElementById("reactionAnswer").value="";document.getElementById("reactionFeedback").textContent="";document.getElementById("reactionFeedback").className="feedback";document.getElementById("reactionScore").textContent="Poäng: "+reactionPoints+" av "+reactions.length;document.getElementById("reactionButton").textContent="Rätta svaret";reactionCorrect=false;reactionHint=0;}
+function checkReaction(){if(reactionCorrect){reactionIndex++;if(reactionIndex<reactions.length){showReaction();}else{document.getElementById("reactionFeedback").textContent="Klart! Du fick "+reactionPoints+" av "+reactions.length+" rätt.";document.getElementById("reactionFeedback").className="feedback correct";document.getElementById("reactionButton").style.display="none";}return;}const e=reactions[reactionIndex];if(normalizeReaction(document.getElementById("reactionAnswer").value)===normalizeReaction(e.a)){reactionPoints++;reactionCorrect=true;document.getElementById("reactionFeedback").textContent="✅ Rätt!";document.getElementById("reactionFeedback").className="feedback correct";document.getElementById("reactionButton").textContent=reactionIndex===reactions.length-1?"Visa resultat":"Nästa uppgift";document.getElementById("reactionScore").textContent="Poäng: "+reactionPoints+" av "+reactions.length;}else{showReactionHint();}}
+function showReactionHint(){const e=reactions[reactionIndex];reactionHint=Math.min(reactionHint+1,e.h.length);document.getElementById("reactionFeedback").textContent="💡 "+e.h[reactionHint-1]+" Försök igen.";document.getElementById("reactionFeedback").className="feedback hint";}
+function restartReactions(){reactionIndex=0;reactionPoints=0;document.getElementById("reactionButton").style.display="block";showReaction();}
+
+
+const bonds=[
+{formula:"H₂O",structure:"Vinklad struktur | H–O–H",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"polar-covalent",hints:["O–H-bindningarna är polärt kovalenta och molekylen är vinklad.","Alla molekyler har Van der Waals-bindning (dispersionskraft/Londonkraft). Polära molekyler har också dipol-dipolbindning.","Väte sitter direkt bundet till syre, så vatten kan bilda vätebindning."]},
+{formula:"CO₂",structure:"Linjär och symmetrisk | O=C=O",polarity:"nonpolar",forces:["dispersion"],intra:"polar-covalent",hints:["C=O-bindningarna är polärt kovalenta.","Molekylen är linjär och symmetrisk, så bindningsdipolerna tar ut varandra.","Mellan opolära CO₂-molekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]},
+{formula:"NH₃",structure:"Trigonal pyramidal struktur",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"polar-covalent",hints:["N–H-bindningarna är polärt kovalenta.","Den osymmetriska formen gör molekylen polär.","Väte sitter direkt bundet till kväve, så ammoniak kan bilda vätebindning."]},
+{formula:"CH₄",structure:"Tetraedrisk och symmetrisk struktur",polarity:"nonpolar",forces:["dispersion"],intra:"nonpolar-covalent",hints:["C–H behandlas som i stort sett opolär kovalent i denna övning.","Den tetraedriska molekylen är symmetrisk och opolär.","Mellan metanmolekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]},
+{formula:"HCl",structure:"Linjär tvåatomig molekyl | H–Cl",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["H–Cl är en polärt kovalent bindning.","Molekylen är polär och har dipol-dipolbindning utöver Van der Waals-bindning (dispersionskraft/Londonkraft).","H är inte bundet till N, O eller F, så vätebindning räknas inte här."]},
+{formula:"CH₃OH",structure:"Metanol | H₃C–O–H",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"mixed-covalent",hints:["Molekylen innehåller både nästan opolära C–H-bindningar och polära C–O- och O–H-bindningar.","Metanol är polär och har dipol-dipolbindning utöver Van der Waals-bindning (dispersionskraft/Londonkraft).","O–H-gruppen gör att metanol kan bilda vätebindning."]},
+{formula:"CCl₄",structure:"Tetraedrisk och symmetrisk struktur",polarity:"nonpolar",forces:["dispersion"],intra:"polar-covalent",hints:["Varje C–Cl-bindning är polärt kovalent.","Den symmetriska formen gör att bindningsdipolerna tar ut varandra.","Mellan opolära CCl₄-molekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]},
+{formula:"SO₂",structure:"Vinklad struktur | O–S–O",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["S–O-bindningarna är polärt kovalenta.","Den vinklade formen gör molekylen polär.","SO₂ saknar H bundet till N, O eller F, så den har Van der Waals-bindning (dispersionskraft/Londonkraft) och dipol-dipolbindning men inte vätebindning."]}
+];
+let bondIndex=0,bondPoints=0,bondCorrect=false,bondHint=0;
+function selectedForces(){
+const selected=[];
+if(document.getElementById("forceDispersion").checked)selected.push("dispersion");
+if(document.getElementById("forceDipole").checked)selected.push("dipole");
+if(document.getElementById("forceHydrogen").checked)selected.push("hydrogen");
+return selected.sort();
+}
+function sameForces(selected,expected){
+const sortedExpected=expected.slice().sort();
+return selected.length===sortedExpected.length&&selected.every(function(value,index){return value===sortedExpected[index];});
+}
+function showBond(){
+const e=bonds[bondIndex];
+document.getElementById("bondNumber").textContent="Uppgift "+(bondIndex+1)+" av "+bonds.length+": "+e.formula;
+document.getElementById("bondMolecule").textContent=e.structure;
+document.getElementById("polarityAnswer").value="";
+document.getElementById("forceDispersion").checked=false;
+document.getElementById("forceDipole").checked=false;
+document.getElementById("forceHydrogen").checked=false;
+document.getElementById("intraAnswer").value="";
+document.getElementById("bondFeedback").textContent="";
+document.getElementById("bondFeedback").className="feedback";
+document.getElementById("bondScore").textContent="Poäng: "+bondPoints+" av "+bonds.length;
+document.getElementById("bondButton").textContent="Rätta svaret";
+bondCorrect=false;
+bondHint=0;
+}
+function checkBond(){
+if(bondCorrect){
+bondIndex++;
+if(bondIndex<bonds.length){showBond();}
+else{
+document.getElementById("bondFeedback").textContent="Klart! Du fick "+bondPoints+" av "+bonds.length+" rätt.";
+document.getElementById("bondFeedback").className="feedback correct";
+document.getElementById("bondButton").style.display="none";
+}
+return;
+}
+const e=bonds[bondIndex];
+const polarity=document.getElementById("polarityAnswer").value;
+const forces=selectedForces();
+const intra=document.getElementById("intraAnswer").value;
+if(!polarity||forces.length===0||!intra){
+document.getElementById("bondFeedback").textContent="Välj polaritet, minst en intermolekylär kraft och en intramolekylär bindning.";
+document.getElementById("bondFeedback").className="feedback hint";
+return;
+}
+if(polarity===e.polarity&&sameForces(forces,e.forces)&&intra===e.intra){
+bondPoints++;
+bondCorrect=true;
+document.getElementById("bondFeedback").textContent="✅ Rätt! Polaritet, intermolekylära krafter och intramolekylär bindning stämmer.";
+document.getElementById("bondFeedback").className="feedback correct";
+document.getElementById("bondButton").textContent=bondIndex===bonds.length-1?"Visa resultat":"Nästa uppgift";
+document.getElementById("bondScore").textContent="Poäng: "+bondPoints+" av "+bonds.length;
+}else{showBondHint();}
+}
+function showBondHint(){
+const e=bonds[bondIndex];
+bondHint=Math.min(bondHint+1,e.hints.length);
+document.getElementById("bondFeedback").textContent="💡 Ledtråd: "+e.hints[bondHint-1]+" Försök igen.";
+document.getElementById("bondFeedback").className="feedback hint";
+}
+function restartBonds(){
+bondIndex=0;
+bondPoints=0;
+document.getElementById("bondButton").style.display="block";
+showBond();
+}
+document.getElementById("reactionAnswer").addEventListener("keydown",function(event){if(event.key==="Enter"){event.preventDefault();checkReaction();}});
+showReaction();
+showBond();
 </script>
 </body>
 </html>
