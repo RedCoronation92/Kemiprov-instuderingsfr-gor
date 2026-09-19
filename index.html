@@ -137,7 +137,20 @@ select option { background-color: #fff !important; color: #111827 !important; -w
 </div>
 </section>
 
-
+<section class="section" id="busiumSection">
+<h2>🎉 Bonusfråga om Busium</h2>
+<div class="card">
+<p><strong>Vilken kemisk beteckning har det spralliga och hoppiga ämnet Busium?</strong></p>
+<fieldset class="bond-options">
+<legend>Välj ett svar:</legend>
+<label><input type="radio" name="busiumAnswer" value="Br"> Br</label>
+<label><input type="radio" name="busiumAnswer" value="Bu2"> Bu₂</label>
+<label><input type="radio" name="busiumAnswer" value="B"> B</label>
+</fieldset>
+<button type="button" onclick="checkBusium()">Rätta bonusfrågan</button>
+<div id="busiumFeedback" class="feedback" aria-live="polite"></div>
+</div>
+</section>
 </main>
 <script>
 const questions = [
@@ -608,6 +621,24 @@ conceptCorrect=false;
 shuffleConcepts();
 document.getElementById("conceptButton").style.display="block";
 showConcept();
+}
+
+
+function checkBusium(){
+const selected=document.querySelector('input[name="busiumAnswer"]:checked');
+const feedback=document.getElementById("busiumFeedback");
+if(!selected){
+feedback.textContent="Välj ett svar innan du rättar.";
+feedback.className="feedback hint";
+return;
+}
+if(selected.value==="Bu2"){
+feedback.textContent="✅ Rätt! Busium har den kemiska beteckningen Bu₂.";
+feedback.className="feedback correct";
+}else{
+feedback.textContent="💡 Inte riktigt. Tänk på att Busium gärna uppträder två och två när det sprallar och hoppar. Försök igen!";
+feedback.className="feedback hint";
+}
 }
 
 
