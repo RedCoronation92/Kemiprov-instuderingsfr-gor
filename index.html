@@ -44,6 +44,19 @@ select option { background-color: #fff !important; color: #111827 !important; -w
 .bond-options { margin: 8px 0 14px; padding: 12px; border: 2px solid #8b7500; border-radius: 8px; }
 .bond-options legend { padding: 0 6px; font-weight: bold; }
 .bond-options label { font-weight: normal; }
+.electron-workspace { display: grid; grid-template-columns: minmax(190px, 1fr) minmax(220px, 1fr); gap: 16px; align-items: stretch; margin: 14px 0; }
+.electron-model { min-height: 260px; display: flex; align-items: center; justify-content: center; padding: 12px; background: radial-gradient(circle at center, #fff 0%, #fffdf2 72%, #f7e8a8 100%); border: 2px solid #d4aa00; border-radius: 10px; }
+.electron-model svg { width: 100%; max-width: 390px; height: auto; }
+.electron-controls { padding: 14px; background: #fff; border: 2px solid #d4aa00; border-radius: 10px; }
+.counter-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center; margin: 10px 0; }
+.counter-row strong { min-width: 86px; }
+.counter-row button { width: 44px; min-height: 44px; padding: 5px; }
+.counter-value { min-width: 46px; padding: 10px 6px; background: #fff8d6; border: 1px solid #d4aa00; border-radius: 7px; text-align: center; font-weight: bold; }
+.electron-total { margin-top: 12px; padding: 10px; background: #fff8d6; border-radius: 8px; text-align: center; font-weight: bold; }
+.lewis-dot { fill: #111827; }
+.lewis-atom { font: bold 25px Arial, sans-serif; fill: #111827; text-anchor: middle; dominant-baseline: middle; }
+.lewis-bond { stroke: #475569; stroke-width: 5; stroke-linecap: round; }
+@media (max-width: 650px) { .electron-workspace { grid-template-columns: 1fr; } .electron-model { min-height: 220px; } }
 @media (max-width: 600px) { body { padding: 8px; } .container { padding: 14px; } h1 { font-size: 1.5rem; } .formula, .molecule { font-size: 1.15rem; } }
 </style>
 </head>
@@ -136,6 +149,34 @@ select option { background-color: #fff !important; color: #111827 !important; -w
 <div id="conceptScore" class="score"></div>
 </div>
 </section>
+
+<section class="section" id="electronSection">
+<h2>⚛️ Fördela elektroner i molekyler</h2>
+<div class="instructions">
+<p>Träna på Lewisstrukturer genom att fördela molekylens valenselektroner som <strong>bindande elektronpar</strong> och <strong>fria elektronpar</strong>.</p>
+<ol><li>Räkna molekylens totala antal valenselektroner.</li><li>Bestäm hur många elektronpar som ingår i bindningar.</li><li>Fördela resten som fria elektronpar.</li><li>Kontrollera duettregeln för väte och oktettregeln för övriga atomer.</li></ol>
+</div>
+<div class="card">
+<p id="electronNumber"></p>
+<div id="electronFormula" class="formula"></div>
+<p id="electronPrompt"></p>
+<div class="electron-workspace">
+<div id="electronModel" class="electron-model" aria-live="polite"></div>
+<div class="electron-controls">
+<div class="counter-row"><strong>Bindande par</strong><button type="button" onclick="changeElectronCount('bonds',-1)" aria-label="Minska bindande elektronpar">−</button><span id="bondPairCount" class="counter-value">0</span><button type="button" onclick="changeElectronCount('bonds',1)" aria-label="Öka bindande elektronpar">+</button></div>
+<div class="counter-row"><strong>Fria par</strong><button type="button" onclick="changeElectronCount('lone',-1)" aria-label="Minska fria elektronpar">−</button><span id="lonePairCount" class="counter-value">0</span><button type="button" onclick="changeElectronCount('lone',1)" aria-label="Öka fria elektronpar">+</button></div>
+<div id="electronTotal" class="electron-total">Använda elektroner: 0</div>
+<p class="small">Varje par motsvarar två elektroner. Modellen visar bindande par mellan atomerna och fria par runt atomerna.</p>
+</div>
+</div>
+<button id="electronButton" type="button" onclick="checkElectrons()">Rätta fördelningen</button>
+<button class="secondary" type="button" onclick="showElectronHint()">Visa en ledtråd</button>
+<button class="secondary" type="button" onclick="restartElectrons()">Börja om</button>
+<div id="electronFeedback" class="feedback" aria-live="polite"></div>
+<div id="electronScore" class="score"></div>
+</div>
+</section>
+
 
 <section class="section" id="busiumSection">
 <h2>🎉 Bonusfråga om Busium</h2>
@@ -624,21 +665,181 @@ showConcept();
 }
 
 
+const electronExercises=[
+{formula:"H₂",name:"Vätgas",valence:2,bonds:1,lone:0,atoms:[["H",105,130],["H",285,130]],edges:[[0,1]],hint:"Vardera väteatom behöver två elektroner. En enkelbindning innehåller ett bindande elektronpar."},
+{formula:"HCl",name:"Väteklorid",valence:8,bonds:1,lone:3,atoms:[["H",105,130],["Cl",285,130]],edges:[[0,1]],hint:"H och Cl delar ett elektronpar. Klor har dessutom tre fria elektronpar."},
+{formula:"Cl₂",name:"Klorgas",valence:14,bonds:1,lone:6,atoms:[["Cl",105,130],["Cl",285,130]],edges:[[0,1]],hint:"Kloratomerna delar ett par. Varje kloratom har tre fria elektronpar."},
+{formula:"H₂O",name:"Vatten",valence:8,bonds:2,lone:2,atoms:[["O",195,105],["H",90,205],["H",300,205]],edges:[[0,1],[0,2]],hint:"Syre bildar två enkelbindningar och behåller två fria elektronpar."},
+{formula:"NH₃",name:"Ammoniak",valence:8,bonds:3,lone:1,atoms:[["N",195,95],["H",75,205],["H",195,225],["H",315,205]],edges:[[0,1],[0,2],[0,3]],hint:"Kväve bildar tre enkelbindningar till väte och har ett fritt elektronpar."},
+{formula:"CH₄",name:"Metan",valence:8,bonds:4,lone:0,atoms:[["C",195,135],["H",70,55],["H",320,55],["H",70,220],["H",320,220]],edges:[[0,1],[0,2],[0,3],[0,4]],hint:"Kol delar fyra elektronpar med fyra väteatomer. Inga fria elektronpar återstår."},
+{formula:"O₂",name:"Syrgas",valence:12,bonds:2,lone:4,atoms:[["O",105,130],["O",285,130]],edges:[[0,1]],hint:"Syreatomerna har en dubbelbindning. Varje syreatom har två fria elektronpar."},
+{formula:"N₂",name:"Kvävgas",valence:10,bonds:3,lone:2,atoms:[["N",105,130],["N",285,130]],edges:[[0,1]],hint:"Kväveatomerna har en trippelbindning. Varje kväveatom har ett fritt elektronpar."},
+{formula:"CO₂",name:"Koldioxid",valence:16,bonds:4,lone:4,atoms:[["O",65,130],["C",195,130],["O",325,130]],edges:[[0,1],[1,2]],hint:"Strukturen är O=C=O. Två dubbelbindningar ger fyra bindande par och syreatomerna har tillsammans fyra fria par."},
+{formula:"BF₃",name:"Bortrifluorid",valence:24,bonds:3,lone:9,atoms:[["B",195,130],["F",195,35],["F",80,220],["F",310,220]],edges:[[0,1],[0,2],[0,3]],hint:"Bor bildar tre enkelbindningar. Varje fluoratom har tre fria elektronpar."}
+];
+let electronIndex=0,electronPoints=0,electronBondPairs=0,electronLonePairs=0,electronCorrect=false;
+
+
+function shuffleElectrons(){
+  shuffleList(electronExercises);
+}
+
+
+function electronPairPositions(atom,pairIndex){
+  const angles=[-90,0,90,180,-45,45,135,225];
+  const angle=angles[pairIndex%angles.length]*Math.PI/180;
+  const radius=34+Math.floor(pairIndex/angles.length)*13;
+  const cx=atom[1]+Math.cos(angle)*radius;
+  const cy=atom[2]+Math.sin(angle)*radius;
+  const tangentX=-Math.sin(angle)*4;
+  const tangentY=Math.cos(angle)*4;
+  return [[cx+tangentX,cy+tangentY],[cx-tangentX,cy-tangentY]];
+}
+
+
+function electronDiagram(item){
+  const edgeOrders=new Array(item.edges.length).fill(0);
+  let remaining=electronBondPairs;
+  let pass=0;
+  while(remaining>0&&item.edges.length){
+    edgeOrders[pass%item.edges.length]++;
+    remaining--;
+    pass++;
+  }
+  let bonds="";
+  item.edges.forEach(function(edge,index){
+    const a=item.atoms[edge[0]],b=item.atoms[edge[1]];
+    const order=edgeOrders[index];
+    const dx=b[1]-a[1],dy=b[2]-a[2],length=Math.sqrt(dx*dx+dy*dy)||1;
+    const ox=-dy/length*6,oy=dx/length*6;
+    for(let line=0;line<order;line++){
+      const shift=line-(order-1)/2;
+      bonds+='<line class="lewis-bond" x1="'+(a[1]+ox*shift)+'" y1="'+(a[2]+oy*shift)+'" x2="'+(b[1]+ox*shift)+'" y2="'+(b[2]+oy*shift)+'"/>';
+    }
+  });
+  let atoms=item.atoms.map(function(atom){
+    return '<circle cx="'+atom[1]+'" cy="'+atom[2]+'" r="27" fill="#fff8d6" stroke="#9a7b00" stroke-width="2"/><text class="lewis-atom" x="'+atom[1]+'" y="'+atom[2]+'">'+atom[0]+'</text>';
+  }).join("");
+  let dots="";
+  const pairsPerAtom=new Array(item.atoms.length).fill(0);
+  for(let pair=0;pair<electronLonePairs;pair++){
+    const atomIndex=pair%item.atoms.length;
+    const positions=electronPairPositions(item.atoms[atomIndex],pairsPerAtom[atomIndex]);
+    pairsPerAtom[atomIndex]++;
+    positions.forEach(function(position){
+      dots+='<circle class="lewis-dot" cx="'+position[0]+'" cy="'+position[1]+'" r="3.6"/>';
+    });
+  }
+  return '<svg viewBox="0 0 390 270" role="img" aria-label="Lewismodell för '+item.formula+'">'+bonds+atoms+dots+'</svg>';
+}
+
+
+function updateElectronDisplay(){
+  const item=electronExercises[electronIndex];
+  document.getElementById("bondPairCount").textContent=electronBondPairs;
+  document.getElementById("lonePairCount").textContent=electronLonePairs;
+  const used=(electronBondPairs+electronLonePairs)*2;
+  document.getElementById("electronTotal").textContent="Använda elektroner: "+used+" av "+item.valence;
+  document.getElementById("electronModel").innerHTML=electronDiagram(item);
+}
+
+
+function changeElectronCount(type,amount){
+  if(electronCorrect)return;
+  if(type==="bonds")electronBondPairs=Math.max(0,Math.min(12,electronBondPairs+amount));
+  if(type==="lone")electronLonePairs=Math.max(0,Math.min(18,electronLonePairs+amount));
+  updateElectronDisplay();
+}
+
+
+function showElectron(){
+  const item=electronExercises[electronIndex];
+  electronBondPairs=0;
+  electronLonePairs=0;
+  electronCorrect=false;
+  document.getElementById("electronNumber").textContent="Uppgift "+(electronIndex+1)+" av "+electronExercises.length;
+  document.getElementById("electronFormula").textContent=item.formula+" – "+item.name;
+  document.getElementById("electronPrompt").textContent="Fördela molekylens "+item.valence+" valenselektroner mellan bindande och fria elektronpar.";
+  document.getElementById("electronFeedback").textContent="";
+  document.getElementById("electronFeedback").className="feedback";
+  document.getElementById("electronScore").textContent="Poäng: "+electronPoints+" av "+electronExercises.length;
+  document.getElementById("electronButton").textContent="Rätta fördelningen";
+  document.getElementById("electronButton").style.display="block";
+  updateElectronDisplay();
+}
+
+
+function checkElectrons(){
+  if(electronCorrect){
+    electronIndex++;
+    if(electronIndex<electronExercises.length){
+      showElectron();
+    }else{
+      document.getElementById("electronFeedback").textContent="Klart! Du fick "+electronPoints+" av "+electronExercises.length+" rätt.";
+      document.getElementById("electronFeedback").className="feedback correct";
+      document.getElementById("electronButton").style.display="none";
+    }
+    return;
+  }
+  const item=electronExercises[electronIndex];
+  const feedback=document.getElementById("electronFeedback");
+  if(electronBondPairs===item.bonds&&electronLonePairs===item.lone){
+    electronPoints++;
+    electronCorrect=true;
+    feedback.textContent="✅ Rätt! "+item.formula+" har "+item.bonds+" bindande elektronpar och "+item.lone+" fria elektronpar.";
+    feedback.className="feedback correct";
+    document.getElementById("electronScore").textContent="Poäng: "+electronPoints+" av "+electronExercises.length;
+    document.getElementById("electronButton").textContent=electronIndex===electronExercises.length-1?"Visa resultat":"Nästa uppgift";
+  }else{
+    const used=(electronBondPairs+electronLonePairs)*2;
+    let message="Din fördelning använder "+used+" av "+item.valence+" valenselektroner. ";
+    if(used<item.valence)message+="Det saknas "+(item.valence-used)+" elektroner.";
+    else if(used>item.valence)message+="Du har använt "+(used-item.valence)+" elektroner för mycket.";
+    else message+="Totala antalet stämmer, men någon elektronpars­typ är fel fördelad.";
+    feedback.textContent="💡 "+message+" Försök igen.";
+    feedback.className="feedback hint";
+  }
+}
+
+
+function showElectronHint(){
+  const item=electronExercises[electronIndex];
+  const feedback=document.getElementById("electronFeedback");
+  feedback.textContent="💡 Ledtråd: "+item.hint;
+  feedback.className="feedback hint";
+}
+
+
+function restartElectrons(){
+  electronIndex=0;
+  electronPoints=0;
+  electronCorrect=false;
+  shuffleElectrons();
+  showElectron();
+}
+
+
 function checkBusium(){
-const selected=document.querySelector('input[name="busiumAnswer"]:checked');
-const feedback=document.getElementById("busiumFeedback");
-if(!selected){
-feedback.textContent="Välj ett svar innan du rättar.";
-feedback.className="feedback hint";
-return;
+  const selectedAnswer=document.querySelector('input[name="busiumAnswer"]:checked');
+  const feedback=document.getElementById("busiumFeedback");
+  if(!selectedAnswer){
+    feedback.textContent="Välj ett svar innan du rättar.";
+    feedback.className="feedback hint";
+    return;
+  }
+  if(selectedAnswer.value==="Bu2"){
+    feedback.textContent="✅ Rätt! Busium har den kemiska beteckningen Bu₂.";
+    feedback.className="feedback correct";
+  }else{
+    feedback.textContent="❌ Fel svar. Ledtråd: Busium är ett spralligt ämne som gärna uppträder två och två. Försök igen!";
+    feedback.className="feedback hint";
+  }
 }
-if(selected.value==="Bu2"){
-feedback.textContent="✅ Rätt! Busium har den kemiska beteckningen Bu₂.";
-feedback.className="feedback correct";
-}else{
-feedback.textContent="💡 Inte riktigt. Tänk på att Busium gärna uppträder två och två när det sprallar och hoppar. Försök igen!";
-feedback.className="feedback hint";
-}
+
+
+const busiumButton=document.getElementById("busiumButton");
+if(busiumButton){
+  busiumButton.addEventListener("click",checkBusium);
 }
 
 
@@ -659,9 +860,11 @@ function shuffleBonds(){
 shuffleReactions();
 shuffleBonds();
 shuffleConcepts();
+shuffleElectrons();
 showReaction();
 showBond();
 showConcept();
+showElectron();
 </script>
 </body>
 </html>
