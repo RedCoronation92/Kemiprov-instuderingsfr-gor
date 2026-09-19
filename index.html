@@ -20,6 +20,16 @@ button { width: 100%; min-height: 48px; padding: 13px; color: #fff; background: 
 button:hover, button:focus { background: #4f3e00; }
 .secondary { margin-top: 10px; color: #493900; background: #f7dc72; }
 .formula, .molecule { margin: 18px 0; padding: 18px; background: #fff; border: 2px solid #d4aa00; border-radius: 8px; color: #1f2937; text-align: center; font-size: 1.45rem; font-weight: bold; white-space: pre-line; }
+.molecule { min-height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(circle at center, #ffffff 0%, #fffdf2 72%, #f7e8a8 100%); }
+.molecule svg { width: 100%; max-width: 620px; height: auto; min-height: 240px; display: block; }
+.atom-label { font: bold 17px Arial, sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+.atom-label-dark { fill: #111827; }
+.molecule-title { font: bold 20px Arial, sans-serif; fill: #4f3e00; text-anchor: middle; }
+.molecule-shape { font: 15px Arial, sans-serif; fill: #5f4b00; text-anchor: middle; }
+.bond-line { stroke: #475569; stroke-width: 7; stroke-linecap: round; }
+.bond-line-thin { stroke: #475569; stroke-width: 4; stroke-linecap: round; }
+.atom-circle { stroke: rgba(31,41,55,.55); stroke-width: 2.5; filter: drop-shadow(0 3px 3px rgba(0,0,0,.22)); }
+@media (max-width: 600px) { .molecule { min-height: 235px; padding: 8px; } .molecule svg { min-height: 205px; } }
 .answer-input, select { width: 100%; min-height: 54px; margin: 8px 0 14px; padding: 12px; border: 2px solid #8b7500; border-radius: 8px; background-color: #fff !important; color: #111827 !important; -webkit-text-fill-color: #111827 !important; color-scheme: light; font-size: 1.05rem; }
 select { appearance: auto; -webkit-appearance: menulist; }
 select option { background-color: #fff !important; color: #111827 !important; -webkit-text-fill-color: #111827 !important; }
@@ -152,14 +162,51 @@ const questions = [
 ["Vilket är en heterogen blandning?",["Saltvatten","Luft","Olja och vatten","Sockerlösning"],2],
 ["Vilket grundämne finns i grupp 1?",["Klor","Neon","Natrium","Syre"],2]
 ];
-const questionContainer = document.getElementById("questions");
-questions.forEach(function(q,i){
-  const div=document.createElement("div");
-  div.className="question";
-  div.innerHTML="<p>"+(i+1)+". "+q[0]+"</p>"+q[1].map(function(a,j){return '<label><input type="radio" name="q'+i+'" value="'+j+'"> '+a+'</label>';}).join("");
-  questionContainer.appendChild(div);
+const questionContainer=document.getElementById("questions");
+let shuffledQuizQuestions=[];
+
+
+function shuffleQuizList(list){
+for(let i=list.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[list[i],list[j]]=[list[j],list[i]];
+}
+return list;
+}
+
+
+function renderQuiz(){
+questionContainer.innerHTML="";
+shuffledQuizQuestions=shuffleQuizList(questions.map(function(q){
+const shuffledAnswers=shuffleQuizList(q[1].map(function(answer,index){
+return {text:answer,isCorrect:index===q[2]};
+}));
+return {question:q[0],answers:shuffledAnswers};
+}));
+
+
+shuffledQuizQuestions.forEach(function(q,i){
+const div=document.createElement("div");
+div.className="question";
+div.innerHTML="<p>"+(i+1)+". "+q.question+"</p>"+q.answers.map(function(answer){
+return '<label><input type="radio" name="q'+i+'" value="'+(answer.isCorrect?'correct':'wrong')+'"> '+answer.text+'</label>';
+}).join("");
+questionContainer.appendChild(div);
 });
-function checkQuiz(){let score=0;questions.forEach(function(q,i){const a=document.querySelector('input[name="q'+i+'"]:checked');if(a&&Number(a.value)===q[2])score++;});let message="Du fick "+score+" av "+questions.length+" rätt.<br><br>";message+=score>=18?"🌟 Mycket väl förberedd!":score>=15?"✅ Bra kunskaper!":score>=10?"📚 Fortsätt träna.":"🧪 Repetera grunderna.";document.getElementById("result").innerHTML=message;}
+}
+function checkQuiz(){
+let score=0;
+shuffledQuizQuestions.forEach(function(q,i){
+const answer=document.querySelector('input[name="q'+i+'"]:checked');
+if(answer&&answer.value==="correct")score++;
+});
+let message="Du fick "+score+" av "+shuffledQuizQuestions.length+" rätt.<br><br>";
+message+=score>=18?"🌟 Mycket väl förberedd!":score>=15?"✅ Bra kunskaper!":score>=10?"📚 Fortsätt träna.":"🧪 Repetera grunderna.";
+document.getElementById("result").innerHTML=message;
+}
+renderQuiz();
+
+
 
 
 const reactions=[
@@ -286,9 +333,73 @@ const bonds=[
 {formula:"HCl",structure:"Linjär tvåatomig molekyl | H–Cl",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["H–Cl är en polärt kovalent bindning.","Molekylen är polär och har dipol-dipolbindning utöver Van der Waals-bindning (dispersionskraft/Londonkraft).","H är inte bundet till N, O eller F, så vätebindning räknas inte här."]},
 {formula:"CH₃OH",structure:"Metanol | H₃C–O–H",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"mixed-covalent",hints:["Molekylen innehåller både nästan opolära C–H-bindningar och polära C–O- och O–H-bindningar.","Metanol är polär och har dipol-dipolbindning utöver Van der Waals-bindning (dispersionskraft/Londonkraft).","O–H-gruppen gör att metanol kan bilda vätebindning."]},
 {formula:"CCl₄",structure:"Tetraedrisk och symmetrisk struktur",polarity:"nonpolar",forces:["dispersion"],intra:"polar-covalent",hints:["Varje C–Cl-bindning är polärt kovalent.","Den symmetriska formen gör att bindningsdipolerna tar ut varandra.","Mellan opolära CCl₄-molekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]},
-{formula:"SO₂",structure:"Vinklad struktur | O–S–O",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["S–O-bindningarna är polärt kovalenta.","Den vinklade formen gör molekylen polär.","SO₂ saknar H bundet till N, O eller F, så den har Van der Waals-bindning (dispersionskraft/Londonkraft) och dipol-dipolbindning men inte vätebindning."]}
+{formula:"SO₂",structure:"Vinklad struktur | O–S–O",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["S–O-bindningarna är polärt kovalenta.","Den vinklade formen gör molekylen polär.","SO₂ saknar H bundet till N, O eller F, så den har Van der Waals-bindning (dispersionskraft/Londonkraft) och dipol-dipolbindning men inte vätebindning."]},
+{formula:"O₂",structure:"Linjär tvåatomig molekyl | O=O",polarity:"nonpolar",forces:["dispersion"],intra:"nonpolar-covalent",hints:["Atomerna är identiska och har samma elektronegativitet.","Elektronerna delas jämnt, så både bindningen och molekylen är opolära.","Mellan O₂-molekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]},
+{formula:"N₂",structure:"Linjär tvåatomig molekyl | N≡N",polarity:"nonpolar",forces:["dispersion"],intra:"nonpolar-covalent",hints:["De två kväveatomerna har samma elektronegativitet.","N≡N är en opolär kovalent bindning och molekylen är opolär.","Endast Van der Waals-bindning (dispersionskraft/Londonkraft) räknas mellan N₂-molekyler."]},
+{formula:"HF",structure:"Linjär tvåatomig molekyl | H–F",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"polar-covalent",hints:["Fluor är betydligt mer elektronegativt än väte.","H–F-bindningen och hela molekylen är polära.","Väte sitter direkt bundet till F, så HF kan bilda vätebindning."]},
+{formula:"H₂S",structure:"Vinklad struktur | H–S–H",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["S–H-bindningarna behandlas som svagt polära i denna övning.","Den vinklade formen gör att dipolerna inte tar ut varandra.","Väte är inte bundet till N, O eller F, så H₂S räknas inte som vätebindande här."]},
+{formula:"BF₃",structure:"Trigonal plan och symmetrisk struktur",polarity:"nonpolar",forces:["dispersion"],intra:"polar-covalent",hints:["Varje B–F-bindning är polärt kovalent.","Den trigonalt plana och symmetriska formen gör att bindningsdipolerna tar ut varandra.","Den opolära molekylen har Van der Waals-bindning (dispersionskraft/Londonkraft) mellan molekylerna."]},
+{formula:"CH₂Cl₂",structure:"Tetraedrisk men osymmetrisk struktur",polarity:"polar",forces:["dispersion","dipole"],intra:"mixed-covalent",hints:["Molekylen innehåller nästan opolära C–H-bindningar och polära C–Cl-bindningar.","Två H och två Cl ger inte en symmetri som tar ut alla bindningsdipoler.","Molekylen är polär men saknar H direkt bundet till N, O eller F."]},
+{formula:"C₂H₅OH",structure:"Etanol | CH₃–CH₂–O–H",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"mixed-covalent",hints:["Etanol innehåller nästan opolära C–C- och C–H-bindningar samt polära C–O- och O–H-bindningar.","O–H-delen gör molekylen polär.","Väte sitter direkt bundet till O, så etanol kan bilda vätebindning."]},
+{formula:"CH₃COCH₃",structure:"Aceton | CH₃–C(=O)–CH₃",polarity:"polar",forces:["dispersion","dipole"],intra:"mixed-covalent",hints:["C=O-bindningen är tydligt polär medan flera C–C- och C–H-bindningar är i stort sett opolära.","Karbonylgruppen ger molekylen en permanent dipol.","Aceton saknar H direkt bundet till N, O eller F och bildar därför inte vätebindning med sig självt i denna övning."]},
+{formula:"NH₂CH₃",structure:"Metylamin | CH₃–NH₂",polarity:"polar",forces:["dispersion","dipole","hydrogen"],intra:"mixed-covalent",hints:["Molekylen innehåller både nästan opolära C–H-bindningar och polära C–N- och N–H-bindningar.","Metylamin är osymmetrisk och polär.","H sitter direkt bundet till N, så molekylerna kan bilda vätebindning."]},
+{formula:"SF₆",structure:"Oktaedrisk och symmetrisk struktur",polarity:"nonpolar",forces:["dispersion"],intra:"polar-covalent",hints:["Varje S–F-bindning är polärt kovalent.","Den oktaedriska och symmetriska formen gör att alla bindningsdipoler tar ut varandra.","Mellan SF₆-molekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]},
+{formula:"PCl₃",structure:"Trigonal pyramidal struktur",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["P–Cl-bindningarna är polärt kovalenta.","Den trigonalt pyramidala formen är osymmetrisk och ger en permanent dipol.","Molekylen saknar väte och kan därför inte bilda vätebindning."]},
+{formula:"NO₂",structure:"Vinklad struktur | O–N–O",polarity:"polar",forces:["dispersion","dipole"],intra:"polar-covalent",hints:["N–O-bindningarna är polärt kovalenta.","Den vinklade geometrin gör att bindningsdipolerna inte tar ut varandra.","NO₂ är polär men saknar H bundet till N, O eller F."]},
+{formula:"CS₂",structure:"Linjär och symmetrisk | S=C=S",polarity:"nonpolar",forces:["dispersion"],intra:"nonpolar-covalent",hints:["C och S har relativt liten skillnad i elektronegativitet i denna övning.","Den linjära och symmetriska formen gör molekylen opolär.","Mellan CS₂-molekyler verkar Van der Waals-bindning (dispersionskraft/Londonkraft)."]}
 ];
 let bondIndex=0,bondPoints=0,bondCorrect=false,bondHint=0;
+
+
+function moleculeDiagram(item){
+const presets={
+"H₂O":{s:"Vinklad",a:[["O",300,115],["H",205,195],["H",395,195]],b:[[0,1,1],[0,2,1]]},
+"CO₂":{s:"Linjär och symmetrisk",a:[["O",160,145],["C",300,145],["O",440,145]],b:[[0,1,2],[1,2,2]]},
+"NH₃":{s:"Trigonal pyramidal",a:[["N",300,105],["H",200,195],["H",400,195],["H",300,220]],b:[[0,1,1],[0,2,1],[0,3,1]]},
+"CH₄":{s:"Tetraedrisk",a:[["C",300,145],["H",200,75],["H",400,75],["H",205,220],["H",395,220]],b:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]]},
+"HCl":{s:"Linjär",a:[["H",225,145],["Cl",375,145]],b:[[0,1,1]]},
+"CH₃OH":{s:"Metanol",a:[["C",190,145],["O",335,145],["H",465,145],["H",125,80],["H",105,195],["H",190,230]],b:[[0,1,1],[1,2,1],[0,3,1],[0,4,1],[0,5,1]]},
+"CCl₄":{s:"Tetraedrisk och symmetrisk",a:[["C",300,145],["Cl",180,70],["Cl",420,70],["Cl",190,225],["Cl",410,225]],b:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]]},
+"SO₂":{s:"Vinklad",a:[["S",300,110],["O",195,200],["O",405,200]],b:[[0,1,2],[0,2,2]]},
+"O₂":{s:"Linjär",a:[["O",225,145],["O",375,145]],b:[[0,1,2]]},
+"N₂":{s:"Linjär",a:[["N",225,145],["N",375,145]],b:[[0,1,3]]},
+"HF":{s:"Linjär",a:[["H",225,145],["F",375,145]],b:[[0,1,1]]},
+"H₂S":{s:"Vinklad",a:[["S",300,110],["H",195,200],["H",405,200]],b:[[0,1,1],[0,2,1]]},
+"BF₃":{s:"Trigonal plan",a:[["B",300,145],["F",300,45],["F",190,220],["F",410,220]],b:[[0,1,1],[0,2,1],[0,3,1]]},
+"CH₂Cl₂":{s:"Tetraedrisk och osymmetrisk",a:[["C",300,145],["Cl",180,70],["Cl",420,70],["H",190,225],["H",410,225]],b:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]]},
+"C₂H₅OH":{s:"Etanol",a:[["C",150,145],["C",275,145],["O",400,145],["H",500,145],["H₃",75,145],["H₂",275,225]],b:[[0,1,1],[1,2,1],[2,3,1],[0,4,1],[1,5,1]]},
+"CH₃COCH₃":{s:"Aceton",a:[["C",145,175],["C",300,175],["O",300,60],["C",455,175],["H₃",70,175],["H₃",530,175]],b:[[0,1,1],[1,2,2],[1,3,1],[0,4,1],[3,5,1]]},
+"NH₂CH₃":{s:"Metylamin",a:[["C",220,145],["N",365,145],["H",440,75],["H",450,215],["H₃",105,145]],b:[[0,1,1],[1,2,1],[1,3,1],[0,4,1]]},
+"SF₆":{s:"Oktaedrisk",a:[["S",300,145],["F",300,40],["F",300,250],["F",175,145],["F",425,145],["F",215,70],["F",385,220]],b:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[0,5,1],[0,6,1]]},
+"PCl₃":{s:"Trigonal pyramidal",a:[["P",300,105],["Cl",185,205],["Cl",415,205],["Cl",300,230]],b:[[0,1,1],[0,2,1],[0,3,1]]},
+"NO₂":{s:"Vinklad",a:[["N",300,110],["O",195,200],["O",405,200]],b:[[0,1,2],[0,2,1]]},
+"CS₂":{s:"Linjär och symmetrisk",a:[["S",160,145],["C",300,145],["S",440,145]],b:[[0,1,2],[1,2,2]]}
+};
+const d=presets[item.formula];
+if(!d)return '<div>'+item.formula+'<br><small>'+item.structure+'</small></div>';
+const colors={H:"#f8fafc","H₂":"#f8fafc","H₃":"#f8fafc",C:"#374151",N:"#2563eb",O:"#dc2626",F:"#22c55e",Cl:"#16a34a",S:"#eab308",P:"#f97316",B:"#f59e0b"};
+function drawBond(edge){
+const p=d.a[edge[0]],q=d.a[edge[1]],order=edge[2];
+const dx=q[1]-p[1],dy=q[2]-p[2],length=Math.sqrt(dx*dx+dy*dy)||1;
+const ox=-dy/length*7,oy=dx/length*7;
+let output="";
+for(let k=0;k<order;k++){
+const shift=k-(order-1)/2;
+output+='<line class="'+(order===1?'bond-line':'bond-line-thin')+'" x1="'+(p[1]+ox*shift)+'" y1="'+(p[2]+oy*shift)+'" x2="'+(q[1]+ox*shift)+'" y2="'+(q[2]+oy*shift)+'"/>';
+}
+return output;
+}
+function drawAtom(atom){
+const symbol=atom[0];
+const hydrogen=symbol.charAt(0)==="H";
+const radius=hydrogen?25:33;
+const dark=hydrogen||symbol==="S"||symbol==="B";
+return '<circle class="atom-circle" cx="'+atom[1]+'" cy="'+atom[2]+'" r="'+radius+'" fill="'+(colors[symbol]||"#64748b")+'"/><text class="atom-label '+(dark?'atom-label-dark':'')+'" x="'+atom[1]+'" y="'+atom[2]+'">'+symbol+'</text>';
+}
+return '<svg viewBox="0 0 600 300" role="img" aria-label="Molekylmodell för '+item.formula+', '+d.s+'"><text class="molecule-title" x="300" y="26">'+item.formula+'</text>'+d.b.map(drawBond).join("")+d.a.map(drawAtom).join("")+'<text class="molecule-shape" x="300" y="286">'+d.s+'</text></svg>';
+}
+
+
 function selectedForces(){
 const selected=[];
 if(document.getElementById("forceDispersion").checked)selected.push("dispersion");
@@ -303,7 +414,7 @@ return selected.length===sortedExpected.length&&selected.every(function(value,in
 function showBond(){
 const e=bonds[bondIndex];
 document.getElementById("bondNumber").textContent="Uppgift "+(bondIndex+1)+" av "+bonds.length+": "+e.formula;
-document.getElementById("bondMolecule").textContent=e.structure;
+document.getElementById("bondMolecule").innerHTML=moleculeDiagram(e);
 document.getElementById("polarityAnswer").value="";
 document.getElementById("forceDispersion").checked=false;
 document.getElementById("forceDipole").checked=false;
@@ -354,6 +465,9 @@ document.getElementById("bondFeedback").className="feedback hint";
 function restartBonds(){
 bondIndex=0;
 bondPoints=0;
+bondCorrect=false;
+bondHint=0;
+shuffleBonds();
 document.getElementById("bondButton").style.display="block";
 showBond();
 }
@@ -498,9 +612,24 @@ showConcept();
 
 
 document.getElementById("reactionAnswer").addEventListener("keydown",function(event){if(event.key==="Enter"){event.preventDefault();checkReaction();}});
+
+
+// Slumpa bindningsuppgifterna med Fisher-Yates-algoritmen.
+// Funktionen ligger direkt före sidstarten så att den alltid är definierad när den anropas.
+function shuffleBonds(){
+  for(let i=bonds.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [bonds[i],bonds[j]]=[bonds[j],bonds[i]];
+  }
+}
+
+
+// Slumpa samtliga träningsdelar redan när sidan öppnas.
+shuffleReactions();
+shuffleBonds();
+shuffleConcepts();
 showReaction();
 showBond();
-shuffleConcepts();
 showConcept();
 </script>
 </body>
