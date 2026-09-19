@@ -106,6 +106,28 @@ select option { background-color: #fff !important; color: #111827 !important; -w
 <div id="bondScore" class="score"></div>
 </div>
 </section>
+
+
+<section class="section" id="conceptSection">
+<h2>📘 Träna på kemiska begrepp</h2>
+<div class="instructions">
+<p>Välj den förklaring som bäst beskriver begreppet. Om svaret är fel får du en ledtråd och kan försöka igen.</p>
+</div>
+<div class="card">
+<p id="conceptNumber"></p>
+<div id="conceptTerm" class="formula"></div>
+<fieldset id="conceptOptions" class="bond-options">
+<legend>Vad betyder begreppet?</legend>
+</fieldset>
+<button id="conceptButton" type="button" onclick="checkConcept()">Rätta svaret</button>
+<button class="secondary" type="button" onclick="showConceptHint()">Visa en ledtråd</button>
+<button class="secondary" type="button" onclick="restartConcepts()">Börja om</button>
+<div id="conceptFeedback" class="feedback" aria-live="polite"></div>
+<div id="conceptScore" class="score"></div>
+</div>
+</section>
+
+
 </main>
 <script>
 const questions = [
@@ -141,19 +163,119 @@ function checkQuiz(){let score=0;questions.forEach(function(q,i){const a=documen
 
 
 const reactions=[
-{u:"H₂ + O₂ → H₂O",a:"2H2+O2->2H2O",h:["Räkna H och O på båda sidor.","Sätt 2 framför H₂O.","Justera H₂."]},
-{u:"N₂ + H₂ → NH₃",a:"N2+3H2->2NH3",h:["Börja med kvävet.","Sätt 2 framför NH₃.","Justera H₂."]},
+{u:"H₂ + O₂ → H₂O",a:"2H2+O2->2H2O",h:["Räkna H och O på båda sidor.","Sätt 2 framför H₂O.","Justera därefter H₂."]},
+{u:"N₂ + H₂ → NH₃",a:"N2+3H2->2NH3",h:["Börja med kvävet.","Sätt 2 framför NH₃.","Justera därefter H₂."]},
 {u:"Fe + O₂ → Fe₂O₃",a:"4FE+3O2->2FE2O3",h:["Minsta gemensamma multipel för 2 och 3 är 6.","Gör sex O på båda sidor.","Balansera Fe sist."]},
 {u:"CH₄ + O₂ → CO₂ + H₂O",a:"CH4+2O2->CO2+2H2O",h:["Balansera C först.","Balansera H därefter.","Balansera O sist."]},
-{u:"Al + O₂ → Al₂O₃",a:"4AL+3O2->2AL2O3",h:["Försök få sex O.","Sätt 3 framför O₂ och 2 framför Al₂O₃.","Balansera Al."]}
+{u:"Al + O₂ → Al₂O₃",a:"4AL+3O2->2AL2O3",h:["Försök få sex O på båda sidor.","Sätt 3 framför O₂ och 2 framför Al₂O₃.","Balansera Al sist."]},
+{u:"Mg + O₂ → MgO",a:"2MG+O2->2MGO",h:["Syre förekommer som O₂.","Sätt 2 framför MgO.","Balansera Mg sist."]},
+{u:"Na + Cl₂ → NaCl",a:"2NA+CL2->2NACL",h:["Det finns två Cl på vänster sida.","Sätt 2 framför NaCl.","Balansera Na sist."]},
+{u:"CaCO₃ → CaO + CO₂",a:"CACO3->CAO+CO2",h:["Räkna Ca, C och O på båda sidor.","Kontrollera om någon koefficient behövs.","Formeln är redan balanserad med koefficienten 1 framför alla ämnen."]},
+{u:"K + H₂O → KOH + H₂",a:"2K+2H2O->2KOH+H2",h:["Vätgas förekommer som H₂.","Sätt 2 framför KOH och H₂O.","Balansera K sist."]},
+{u:"Zn + HCl → ZnCl₂ + H₂",a:"ZN+2HCL->ZNCL2+H2",h:["Det finns två Cl i ZnCl₂.","Sätt 2 framför HCl.","Kontrollera därefter H och Zn."]},
+{u:"H₂ + Cl₂ → HCl",a:"H2+CL2->2HCL",h:["Både H och Cl förekommer två och två på vänster sida.","Sätt en koefficient framför HCl.","Två HCl ger två H och två Cl."]},
+{u:"P₄ + O₂ → P₂O₅",a:"P4+5O2->2P2O5",h:["Balansera P först.","Sätt 2 framför P₂O₅.","Då behövs tio O, alltså 5 O₂."]},
+{u:"C₂H₆ + O₂ → CO₂ + H₂O",a:"2C2H6+7O2->4CO2+6H2O",h:["Balansera C och H före O.","Undvik bråktal genom att börja med 2 C₂H₆.","Räkna sedan det totala antalet O på höger sida."]},
+{u:"C₃H₈ + O₂ → CO₂ + H₂O",a:"C3H8+5O2->3CO2+4H2O",h:["Balansera tre C först.","Balansera åtta H därefter.","Räkna O sist."]},
+{u:"NaOH + HCl → NaCl + H₂O",a:"NAOH+HCL->NACL+H2O",h:["Räkna Na, O, H och Cl.","Kontrollera om formeln redan är balanserad.","Alla ämnen kan ha koefficienten 1."]},
+{u:"BaCl₂ + Na₂SO₄ → BaSO₄ + NaCl",a:"BACL2+NA2SO4->BASO4+2NACL",h:["Behandla SO₄ som en enhet.","Ba och SO₄ är redan balanserade.","Sätt 2 framför NaCl."]},
+{u:"AgNO₃ + NaCl → AgCl + NaNO₃",a:"AGNO3+NACL->AGCL+NANO3",h:["Behandla NO₃ som en enhet.","Räkna Ag, Na och Cl.","Reaktionen är redan balanserad."]},
+{u:"FeCl₃ + NaOH → Fe(OH)₃ + NaCl",a:"FECL3+3NAOH->FE(OH)3+3NACL",h:["Det finns tre Cl i FeCl₃.","Sätt 3 framför NaCl.","Sätt sedan 3 framför NaOH för att balansera Na och OH."]},
+{u:"KClO₃ → KCl + O₂",a:"2KCLO3->2KCL+3O2",h:["Syre finns tre åt gången till vänster och två åt gången till höger.","Minsta gemensamma multipel är 6.","Sätt 2 framför KClO₃ och KCl samt 3 framför O₂."]},
+{u:"NH₃ + O₂ → NO + H₂O",a:"4NH3+5O2->4NO+6H2O",h:["Balansera N först.","Välj 4 NH₃ för att få ett jämnt antal H.","Balansera H₂O och räkna O sist."]}
 ];
 let reactionIndex=0,reactionPoints=0,reactionCorrect=false,reactionHint=0;
+function shuffleReactions(){
+for(let i=reactions.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[reactions[i],reactions[j]]=[reactions[j],reactions[i]];
+}
+}
 function normalizeReaction(v){return v.toUpperCase().replaceAll("₁","1").replaceAll("₂","2").replaceAll("₃","3").replaceAll("₄","4").replaceAll("→","->").replace(/\s+/g,"");}
 function insertSymbol(symbol){const input=document.getElementById("reactionAnswer");const start=input.selectionStart??input.value.length;const end=input.selectionEnd??start;input.value=input.value.slice(0,start)+symbol+input.value.slice(end);input.focus();input.setSelectionRange(start+symbol.length,start+symbol.length);}
 function showReaction(){const e=reactions[reactionIndex];document.getElementById("reactionNumber").textContent="Uppgift "+(reactionIndex+1)+" av "+reactions.length;document.getElementById("unbalancedReaction").textContent=e.u;document.getElementById("reactionAnswer").value="";document.getElementById("reactionFeedback").textContent="";document.getElementById("reactionFeedback").className="feedback";document.getElementById("reactionScore").textContent="Poäng: "+reactionPoints+" av "+reactions.length;document.getElementById("reactionButton").textContent="Rätta svaret";reactionCorrect=false;reactionHint=0;}
 function checkReaction(){if(reactionCorrect){reactionIndex++;if(reactionIndex<reactions.length){showReaction();}else{document.getElementById("reactionFeedback").textContent="Klart! Du fick "+reactionPoints+" av "+reactions.length+" rätt.";document.getElementById("reactionFeedback").className="feedback correct";document.getElementById("reactionButton").style.display="none";}return;}const e=reactions[reactionIndex];if(normalizeReaction(document.getElementById("reactionAnswer").value)===normalizeReaction(e.a)){reactionPoints++;reactionCorrect=true;document.getElementById("reactionFeedback").textContent="✅ Rätt!";document.getElementById("reactionFeedback").className="feedback correct";document.getElementById("reactionButton").textContent=reactionIndex===reactions.length-1?"Visa resultat":"Nästa uppgift";document.getElementById("reactionScore").textContent="Poäng: "+reactionPoints+" av "+reactions.length;}else{showReactionHint();}}
-function showReactionHint(){const e=reactions[reactionIndex];reactionHint=Math.min(reactionHint+1,e.h.length);document.getElementById("reactionFeedback").textContent="💡 "+e.h[reactionHint-1]+" Försök igen.";document.getElementById("reactionFeedback").className="feedback hint";}
-function restartReactions(){reactionIndex=0;reactionPoints=0;document.getElementById("reactionButton").style.display="block";showReaction();}
+function parseFormula(formula){
+const text=formula.replace(/\s+/g,"");
+let index=0;
+function readNumber(){
+let digits="";
+while(index<text.length&&/[0-9]/.test(text[index]))digits+=text[index++];
+return digits?Number(digits):1;
+}
+function readGroup(stopAtParen){
+const counts={};
+while(index<text.length){
+if(text[index]===")"&&stopAtParen){index++;break;}
+if(text[index]==="("){
+index++;
+const inner=readGroup(true);
+const multiplier=readNumber();
+Object.keys(inner).forEach(function(element){counts[element]=(counts[element]||0)+inner[element]*multiplier;});
+continue;
+}
+const match=text.slice(index).match(/^[A-Z][a-z]?/);
+if(!match)return null;
+const element=match[0];
+index+=element.length;
+const amount=readNumber();
+counts[element]=(counts[element]||0)+amount;
+}
+return counts;
+}
+const result=readGroup(false);
+return result&&index===text.length?result:null;
+}
+function analyzeEquation(value){
+const normalized=value.replaceAll("₁","1").replaceAll("₂","2").replaceAll("₃","3").replaceAll("₄","4").replaceAll("→","->").replace(/\s+/g,"");
+const sides=normalized.split("->");
+if(sides.length!==2||!sides[0]||!sides[1])return {error:"Skriv en reaktionspil mellan reaktanter och produkter, till exempel -> eller →."};
+function countSide(side){
+const total={};
+const substances=side.split("+");
+for(const substance of substances){
+if(!substance)return null;
+const coefficientMatch=substance.match(/^(\d+)(.*)$/);
+const coefficient=coefficientMatch?Number(coefficientMatch[1]):1;
+const formula=coefficientMatch?coefficientMatch[2]:substance;
+const atoms=parseFormula(formula.charAt(0).toUpperCase()+formula.slice(1));
+if(!atoms)return null;
+Object.keys(atoms).forEach(function(element){total[element]=(total[element]||0)+atoms[element]*coefficient;});
+}
+return total;
+}
+const left=countSide(sides[0]);
+const right=countSide(sides[1]);
+if(!left||!right)return {error:"Kontrollera att alla ämnen och koefficienter är korrekt skrivna. Skriv koefficienten framför formeln."};
+const elements=Array.from(new Set(Object.keys(left).concat(Object.keys(right))));
+const missing=elements.filter(function(element){return !(element in left)||!(element in right);});
+if(missing.length)return {error:"Kontrollera ämnena i reaktionsformeln. Grundämnet "+missing[0]+" finns bara på ena sidan."};
+const differences=elements.filter(function(element){return left[element]!==right[element];});
+if(!differences.length)return {balanced:true};
+differences.sort(function(a,b){return Math.abs(left[b]-right[b])-Math.abs(left[a]-right[a]);});
+const element=differences[0];
+return {balanced:false,element:element,left:left[element],right:right[element],differenceCount:differences.length};
+}
+function showReactionHint(){
+const e=reactions[reactionIndex];
+const answer=document.getElementById("reactionAnswer").value.trim();
+let message="";
+if(!answer){
+reactionHint=(reactionHint+1)%e.h.length;
+message=e.h[reactionHint];
+}else{
+const analysis=analyzeEquation(answer);
+if(analysis.error){message=analysis.error;}
+else if(analysis.balanced){message="Din atomräkning är balanserad. Kontrollera nu att du har använt samma ämnen och minsta möjliga heltalskoefficienter som i uppgiften.";}
+else{
+message="Grundämnet "+analysis.element+" är inte balanserat i ditt svar: vänster sida har "+analysis.left+" och höger sida har "+analysis.right+". Ändra en koefficient framför ett ämne som innehåller "+analysis.element+".";
+if(analysis.differenceCount>1)message+=" Det finns även "+(analysis.differenceCount-1)+" annat/andra obalanserade grundämnen.";
+}
+}
+document.getElementById("reactionFeedback").textContent="💡 "+message+" Försök igen.";
+document.getElementById("reactionFeedback").className="feedback hint";
+}
+function restartReactions(){reactionIndex=0;reactionPoints=0;reactionCorrect=false;reactionHint=0;shuffleReactions();document.getElementById("reactionButton").style.display="block";showReaction();}
 
 
 const bonds=[
@@ -235,9 +357,151 @@ bondPoints=0;
 document.getElementById("bondButton").style.display="block";
 showBond();
 }
+const concepts=[
+{term:"Atomnummer",options:["Antalet protoner i atomkärnan","Summan av protoner och neutroner","Antalet elektronskal","Atomens massa i gram"],correct:0,hint:"Detta tal bestämmer vilket grundämne atomen är."},
+{term:"Masstal",options:["Antalet elektroner","Summan av protoner och neutroner","Antalet protoner","Antalet valenselektroner"],correct:1,hint:"Räkna protoner och neutroner i atomkärnan."},
+{term:"Isotop",options:["Atomer med samma antal protoner men olika antal neutroner","Atomer med olika antal protoner","En positiv jon","En molekyl med två atomer"],correct:0,hint:"Grundämnet är detsamma, men antalet neutroner skiljer sig."},
+{term:"Jon",options:["En laddad atom eller molekyl","En neutral atom","Ett elektronpar","En blandning"],correct:0,hint:"Partikeln har tagit upp eller avgett elektroner."},
+{term:"Katjon",options:["En positiv jon","En negativ jon","En neutral molekyl","En isotop"],correct:0,hint:"Den har avgett elektroner."},
+{term:"Anjon",options:["En negativ jon","En positiv jon","En atomkärna","En opolär molekyl"],correct:0,hint:"Den har tagit upp elektroner."},
+{term:"Valenselektron",options:["En elektron i atomens yttersta skal","En proton i atomkärnan","En elektron i innersta skalet","En neutron"],correct:0,hint:"Dessa elektroner deltar ofta i kemiska bindningar."},
+{term:"Elektronegativitet",options:["En atoms förmåga att dra till sig bindningselektroner","Antalet elektroner i en atom","Atomens laddning","Hur lätt en atom avger neutroner"],correct:0,hint:"Begreppet hjälper dig avgöra om en bindning är polär."},
+{term:"Reaktant",options:["Ett ämne som finns före en kemisk reaktion","Ett ämne som bildas efter reaktionen","En katalysator","En lösning"],correct:0,hint:"Det står normalt till vänster om reaktionspilen."},
+{term:"Produkt",options:["Ett ämne som bildas i en kemisk reaktion","Ett ämne som endast finns före reaktionen","En elektron","Ett atomnummer"],correct:0,hint:"Det står normalt till höger om reaktionspilen."},
+{term:"Koefficient",options:["Talet framför en kemisk formel","Det nedsänkta talet i formeln","Atomnumret","Jonladdningen"],correct:0,hint:"Det visar hur många partiklar eller formelenheter som deltar."},
+{term:"Kovalent bindning",options:["Atomer delar elektronpar","Elektroner överförs helt mellan joner","Metalljoner omges av fria elektroner","Molekyler attraheras av tillfälliga dipoler"],correct:0,hint:"Den kallas även elektronparbindning."},
+{term:"Jonbindning",options:["Attraktion mellan positiva och negativa joner","Delning av elektronpar","Attraktion mellan opolära molekyler","Bindning mellan neutroner"],correct:0,hint:"Motsatt laddade partiklar attraherar varandra."},
+{term:"Polär molekyl",options:["En molekyl med ojämn laddningsfördelning","En molekyl utan elektroner","En molekyl utan atomkärnor","En positiv jon"],correct:0,hint:"Bindningsdipolerna tar inte helt ut varandra."},
+{term:"Homogen blandning",options:["En jämnt fördelad blandning","En blandning där delarna kan urskiljas","Ett rent grundämne","En jonförening"],correct:0,hint:"Blandningen ser likadan ut i hela provet."},
+{term:"Heterogen blandning",options:["En blandning där olika delar eller faser kan urskiljas","En helt jämn lösning","Ett rent ämne","En reaktionsformel"],correct:0,hint:"Olja och vatten är ett exempel."},
+{term:"Grundämne",options:["Ett ämne som bara består av en sorts atomer","Ett ämne med flera olika molekyler","En blandning av metaller","En laddad partikel"],correct:0,hint:"Alla atomer i ämnet har samma atomnummer."},
+{term:"Kemisk förening",options:["Ett rent ämne som innehåller minst två olika grundämnen kemiskt bundna","En blandning som kan separeras genom filtrering","Ett ämne med bara en sorts atom","En positiv jon"],correct:0,hint:"Vatten och natriumklorid är exempel."},
+{term:"Molekyl",options:["Två eller flera atomer som hålls samman av kovalenta bindningar","En ensam proton","Ett kristallgitter av metalljoner","En blandning av flera ämnen"],correct:0,hint:"Atomerna delar elektronpar."},
+{term:"Formelenhet",options:["Det minsta heltalsförhållandet mellan joner i en jonförening","En ensam molekyl i en metall","Antalet neutroner i en isotop","En koefficient i en reaktionsformel"],correct:0,hint:"Jonföreningar består inte av avgränsade molekyler."},
+{term:"Substansmängd",options:["Ett mått på antalet partiklar med enheten mol","Ett ämnes volym i liter","Ett ämnes temperatur","Antalet elektronskal"],correct:0,hint:"Storheten betecknas ofta med n."},
+{term:"Mol",options:["En substansmängd som innehåller ungefär 6,022 · 10²³ partiklar","Massan av en enda atom","Volymen av en liter gas","Antalet protoner i kol"],correct:0,hint:"Enheten används för att räkna mycket stora antal partiklar."},
+{term:"Avogadros konstant",options:["Antalet partiklar per mol, ungefär 6,022 · 10²³ mol⁻¹","Vattnets densitet","Ljusets hastighet","Antalet neutroner i kol-12"],correct:0,hint:"Konstanten kopplar samman substansmängd och antal partiklar."},
+{term:"Molmassa",options:["Massan av en mol av ett ämne, vanligen i g/mol","Volymen av en mol gas i alla situationer","Massan av en elektron","Antalet mol i ett gram"],correct:0,hint:"Storheten betecknas ofta med M."},
+{term:"Koncentration",options:["Substansmängd löst ämne per volym lösning, ofta mol/dm³","Massan av lösningsmedlet","Antalet protoner per atom","Temperaturen hos en lösning"],correct:0,hint:"Storheten kan beräknas med c = n/V."},
+{term:"Lösningsmedel",options:["Det ämne som löser ett annat ämne och vanligen finns i störst mängd","Det ämne som alltid fälls ut","En katalysator","En gas som bildas i en reaktion"],correct:0,hint:"I saltvatten är vatten detta ämne."},
+{term:"Löst ämne",options:["Det ämne som löses i ett lösningsmedel","Det ämne som alltid är flytande","Den fasta rest som aldrig kan lösas","Ett ämne som sänker aktiveringsenergin"],correct:0,hint:"I saltvatten är natriumklorid detta ämne."},
+{term:"Mättad lösning",options:["En lösning som vid aktuell temperatur inte kan lösa mer av ämnet","En lösning utan löst ämne","En lösning med pH 7","En lösning som bara innehåller gas"],correct:0,hint:"Ytterligare ämne blir kvar olöst om temperaturen är oförändrad."},
+{term:"Fällning",options:["Ett svårlösligt fast ämne som bildas i en lösning","En gas som lämnar en vätska","En elektron som avges","En homogen blandning"],correct:0,hint:"Den kan uppstå när två jonlösningar blandas."},
+{term:"Katalysator",options:["Ett ämne som ökar reaktionshastigheten genom att sänka aktiveringsenergin utan att förbrukas","Ett ämne som alltid höjer temperaturen","En reaktant som förbrukas helt","En produkt med hög molmassa"],correct:0,hint:"Ämnet erbjuder en alternativ reaktionsväg."},
+{term:"Aktiveringsenergi",options:["Den minsta energi som krävs för att en reaktion ska starta","Den energi som alltid frigörs i en reaktion","Massan som försvinner vid förbränning","Energin i en neutron"],correct:0,hint:"En katalysator minskar denna energibarriär."},
+{term:"Exoterm reaktion",options:["En reaktion som avger energi till omgivningen","En reaktion som tar upp energi från omgivningen","En reaktion utan energiomsättning","En reaktion som bara sker i vatten"],correct:0,hint:"Omgivningen blir ofta varmare."},
+{term:"Endoterm reaktion",options:["En reaktion som tar upp energi från omgivningen","En reaktion som alltid avger ljus","En reaktion där inga bindningar bryts","En reaktion som saknar produkter"],correct:0,hint:"Omgivningen kan bli kallare."},
+{term:"Oxidation",options:["Avgivning av elektroner","Upptagning av elektroner","Upptagning av protoner","Bildning av en homogen blandning"],correct:0,hint:"Minnesregel: oxidation innebär elektronförlust."},
+{term:"Reduktion",options:["Upptagning av elektroner","Avgivning av elektroner","Förlust av neutroner","Sönderdelning av en lösning"],correct:0,hint:"Minnesregel: reduktion innebär elektronvinst."},
+{term:"Redoxreaktion",options:["En reaktion där oxidation och reduktion sker samtidigt","En neutralisation utan elektronöverföring","En fysikalisk fasövergång","En blandning av två gaser"],correct:0,hint:"Elektroner överförs mellan ämnen."},
+{term:"Syra",options:["Ett ämne som kan avge protoner, H⁺","Ett ämne som alltid avger elektroner","Ett ämne med pH över 7","Ett ämne som bara innehåller syre"],correct:0,hint:"Enligt Brønsteds definition är ämnet en protongivare."},
+{term:"Bas",options:["Ett ämne som kan ta upp protoner, H⁺","Ett ämne som alltid har pH under 7","Ett ämne som avger neutroner","Ett ämne utan elektroner"],correct:0,hint:"Enligt Brønsteds definition är ämnet en protontagare."},
+{term:"pH",options:["Ett mått på en lösnings surhetsgrad","Ett mått på molmassan","Antalet protoner i en atomkärna","Ett mått på reaktionshastigheten"],correct:0,hint:"Lågt värde betyder sur lösning och högt värde betyder basisk lösning."},
+{term:"Neutralisation",options:["En reaktion mellan en syra och en bas där vatten ofta bildas","En reaktion där bara elektroner avges","En fasövergång från gas till vätska","En separation genom filtrering"],correct:0,hint:"Oxoniumjoner och hydroxidjoner kan bilda vatten."},
+{term:"Dipol",options:["En partikel med en positiv och en negativ ände på grund av ojämn laddningsfördelning","En helt symmetrisk opolär molekyl","En positiv jon utan elektroner","En neutronrik isotop"],correct:0,hint:"Molekylen har ett permanent dipolmoment."},
+{term:"Intermolekylär bindning",options:["Attraktionskraft mellan molekyler","Bindning mellan protoner och neutroner","Bindning mellan atomer inne i en molekyl","Elektronöverföring i en atomkärna"],correct:0,hint:"Förledet inter betyder mellan."},
+{term:"Intramolekylär bindning",options:["Bindning som håller samman atomer inom en molekyl eller kemisk struktur","Attraktion enbart mellan olika molekyler","En kraft mellan lösningsmedel och behållare","En fasövergång"],correct:0,hint:"Förledet intra betyder inom."},
+{term:"Vätebindning",options:["En relativt stark intermolekylär attraktion när H är bundet till N, O eller F","En jonbindning mellan vätejoner","En metallbindning i vätegas","En opolär kovalent bindning"],correct:0,hint:"Leta efter H direkt bundet till N, O eller F."},
+{term:"Van der Waals-bindning",options:["En intermolekylär attraktion som bland annat omfattar dispersionskrafter från tillfälliga dipoler","En bindning mellan metalljoner och fria elektroner","En stark jonbindning i salter","En bindning inne i atomkärnan"],correct:0,hint:"Dispersionskraft eller Londonkraft är den benämning som används i övningen."}
+];
+let conceptIndex=0,conceptPoints=0,conceptCorrect=false;
+
+
+function shuffleList(list){
+for(let i=list.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[list[i],list[j]]=[list[j],list[i]];
+}
+return list;
+}
+
+
+function shuffleConcepts(){
+shuffleList(concepts);
+}
+
+
+function showConcept(){
+const item=concepts[conceptIndex];
+document.getElementById("conceptNumber").textContent="Begrepp "+(conceptIndex+1)+" av "+concepts.length;
+document.getElementById("conceptTerm").textContent=item.term;
+
+
+const shuffledOptions=shuffleList(item.options.map(function(option,index){
+return {text:option,isCorrect:index===item.correct};
+}));
+
+
+document.getElementById("conceptOptions").innerHTML=
+"<legend>Vad betyder begreppet?</legend>"+
+shuffledOptions.map(function(option){
+return '<label><input type="radio" name="conceptAnswer" value="'+(option.isCorrect?"correct":"wrong")+'"> '+option.text+'</label>';
+}).join("");
+
+
+document.getElementById("conceptFeedback").textContent="";
+document.getElementById("conceptFeedback").className="feedback";
+document.getElementById("conceptScore").textContent="Poäng: "+conceptPoints+" av "+concepts.length;
+document.getElementById("conceptButton").textContent="Rätta svaret";
+conceptCorrect=false;
+}
+
+
+function checkConcept(){
+if(conceptCorrect){
+conceptIndex++;
+if(conceptIndex<concepts.length){
+showConcept();
+}else{
+document.getElementById("conceptFeedback").textContent="Klart! Du fick "+conceptPoints+" av "+concepts.length+" rätt.";
+document.getElementById("conceptFeedback").className="feedback correct";
+document.getElementById("conceptButton").style.display="none";
+}
+return;
+}
+
+
+const selected=document.querySelector('input[name="conceptAnswer"]:checked');
+if(!selected){
+document.getElementById("conceptFeedback").textContent="Välj ett svar innan du rättar.";
+document.getElementById("conceptFeedback").className="feedback hint";
+return;
+}
+
+if(selected.value==="correct"){
+conceptPoints++;
+conceptCorrect=true;
+document.getElementById("conceptFeedback").textContent="✅ Rätt!";
+document.getElementById("conceptFeedback").className="feedback correct";
+document.getElementById("conceptButton").textContent=conceptIndex===concepts.length-1?"Visa resultat":"Nästa begrepp";
+document.getElementById("conceptScore").textContent="Poäng: "+conceptPoints+" av "+concepts.length;
+}else{
+showConceptHint();
+}
+}
+
+
+function showConceptHint(){
+document.getElementById("conceptFeedback").textContent="💡 Ledtråd: "+concepts[conceptIndex].hint+" Försök igen.";
+document.getElementById("conceptFeedback").className="feedback hint";
+}
+
+
+function restartConcepts(){
+conceptIndex=0;
+conceptPoints=0;
+conceptCorrect=false;
+shuffleConcepts();
+document.getElementById("conceptButton").style.display="block";
+showConcept();
+}
+
+
 document.getElementById("reactionAnswer").addEventListener("keydown",function(event){if(event.key==="Enter"){event.preventDefault();checkReaction();}});
 showReaction();
 showBond();
+shuffleConcepts();
+showConcept();
 </script>
 </body>
 </html>
